@@ -1,0 +1,233 @@
+\documentclass[10pt, titlepage]{article}
+\usepackage{amsmath,amsthm,amssymb, listings, tikz, pgf, mathtools}
+\usepackage[top=1.25in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
+\usepackage{pgf}
+\usepackage{tikz}
+
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{sectsty}
+\subsectionfont{\normalsize}
+\subsubsectionfont{\small}
+\usepackage{listings}
+\usepackage{changepage}
+
+\usepackage{utopia}
+
+\usepackage[linesnumbered,ruled]{algorithm2e}
+
+\usepackage{csquotes}
+\usepackage{gensymb}
+\usepackage[font=footnotesize]{caption}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+
+\usetikzlibrary{arrows,automata}
+\usepackage[latin1]{inputenc}
+\def\imp{\rightarrow}
+\def\Imp{\Rightarrow}
+\def\bicon{\leftrightarrow}
+\def\nilstr{\varepsilon}
+\newcommand\XOR{\mathbin{\char`\^}}
+\newcommand\mb{\mathbf}
+\DeclareMathOperator*{\argmin}{argmin}
+\DeclareMathOperator*{\argmax}{argmax}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
+\usepackage{listings}
+\lstset{
+  mathescape,
+  frame=tb,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\ttfamily\small},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\usepackage[hidelinks]{hyperref}
+
+\title{Modeling Topological Maps Using Sum-Product Networks}
+\author{Kaiyu Zheng}
+\date{April 2017}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Title Page
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{titlepage}
+\centering
+\topskip0pt
+\vspace*{\fill}
+  \huge Learning Large-Scale Topological Maps Using Sum-Product Networks\normalsize
+
+  \vspace{0.5in}
+
+  \Large Kaiyu Zheng\large
+
+  \vspace{2in}
+
+  A thesis submitted in partial fulfillment of the requirements for the degree of
+
+  \vspace{0.1in}
+
+  Bachelor of Science with Departmental Honor
+
+  \vspace{0.8in}
+  University of Washington
+
+  2017
+
+  \vspace{0.4in}
+  Advisors
+
+  Dr.~Andrzej Pronobis
+
+  Prof.~Rajesh Rao
+
+  \vspace{0.8in}
+  Program Authorized to Offer Degree:
+
+  \vspace{0.1in}
+
+  Paul Allen's School of Computer Science \& Engineering\normalsize
+\vspace*{\fill}
+
+\end{titlepage}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Abstract
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagenumbering{Roman} % Start roman numbering
+\begin{center}\Large \textbf{Abstract}\normalsize\end{center}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of Figures
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\listoffigures
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% List of Tables
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\listoftables
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Table of Contents
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\tableofcontents
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Introduction
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\pagenumbering{arabic} % Switch to normal numbers
+\section{Introduction}
+The foundamental motivation of robotics is two-fold. First, robots can take risks in the place of humans, do what humans cannot or struggle to do. Second, robots can assist humans to achieve their goals more efficiently and effectively. The continuing favor of machines in the last several decades saw an explosion of interest and investment in robotics both in commercial applications and academic research \cite{pagliarini2017future}. With little doubt, one of the significant directions of continuously heavy research is on autonomous robots. In this paper, we consider a subfield of autonomous robots, which is that of mobile robots in indoor environments. Mobile robots are desirable to meet both aspects of the motivation, especially the second; They have the potential to provide various kinds of services, and recently attempts has been made to apply mobile robots to real-world problems such as helping older people \cite{jayawardena2010deployment}, guiding passengers in airports \cite{triebel2016spencer}, and telepresence \cite{matsuda2016scalablebody}. However, these robots are still far away from fully autonomous, and can only perform limited actions with specially designed tasks.
+
+To enable autonomous mobile robots to exhibit complex behaviors in indoor environments, it is crucial for them to form an understanding of the environment, that is, to gather and maintain spatial knowledge. The framework that organizes this understanding is called the spatial knowledge representation. Additionally, it is also crucial for the robots to be able to learn about the spatial knowledge representation. In this paper, for spetial knowledge representation, we use the Deep Affordance Spatial Hierarchy (DASH) \cite{pronobis2017deep}, a recently proposed hierarchical representation that spans from low-level sensory input level layer to high level human semantics layer. Specifically, in this paper, we devote our time on learning the layer of a topological map, which is a graph that contains information of places and their connectivity for a given full floor map.
+
+
+
+
+\subsection{Thesis outline}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Related Works
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Related Works}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Background
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Background}
+\subsection{Sum-Product Networks}
+\subsection{Deep Affordance Spatial Hierarchy}
+\subsection{Topological Maps}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem Statement
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Problem Statement}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Proposed Solutions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Proposed Solutions}
+\subsection{Grid-Based Approach}
+\subsection{Template-Based Approach}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Experiments
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Experiments}
+\subsection{Data Collection}
+\subsection{Methodology}
+\subsubsection{Experiments for Grid-Based Approach}
+\subsubsection{Experiments for Template-Based Approach}
+\subsection{Results}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Conclusion & Future work
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Conclusion \& Future Work}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{References}
+\nocite{*}
+\bibliographystyle{abbrv}
+\bibliography{mythesis}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Acknowledgement
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\section{Acknowledgements}
+
+\newpage
+\appendix
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
