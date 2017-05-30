@@ -13,6 +13,10 @@
 \usepackage{listings}
 \usepackage{changepage}
 
+\usepackage{footnote}
+\makesavenoteenv{tabular}
+\makesavenoteenv{table}
+
 \usepackage[linesnumbered,ruled]{algorithm2e}
 
 \usepackage{csquotes}
@@ -352,7 +356,7 @@ Given a 2D place grid $G$ with resolution $r$, we can map a place $p$ in topolog
 \end{equation}
 where $p_{x_{min}}^M$ is the $x$ coordinate for the place with minimum $x$ coordinate (similar goes for $p_{x_{min}}^M$).
 
-To avoid gaps between places mapped to the grid which disturb adjacency relations between places, we can map the topological map to a place grid with resolution at most $d_n$. (Recall from equation (\ref{eq:phi_n}) that places in a topological map are separated by a predefined distance $d_n$.)
+To avoid gaps between places mapped to the grid which disturb adjacency relations between places, we can map the topological map to a place grid with resolution at most $d_n$. (Recall from equation (\ref{eq:phi_n}) that places in a topological map are separated by a predefined distance $d_n$.)\label{sc:avoidgaps}
 
 To deal with the situation where multiple places map to the same cell, we can do either of the following:
 \begin{itemize}
@@ -468,11 +472,49 @@ We can use the random-decomposition method to construct an SPN for $\mathcal{S}$
 
 In support of the larger goal of our research to learn the Deep Affordance Spatial Hierarchy (DASH), we collected a large dataset of fully-annotated sensory (RGB, laser rangefinder readings, odometry), localization, and virtual scans, a low-level representation of the environment immediate to the robot. For this thesis, we utilized this dataset to generate topological maps with nodes labeled by place categories.
 
-The dataset consists of sequences
+The dataset consists of 100 sequences and total of 11 different floor plans in three buildings in three different locations: Stockholm, Sweden, Freiburg, Germany, and Saarbrucken, Germany. Summary of the sequences is shown in table \ref{table:dataset}. For each sequence, among the types of data contained,  there is a corresponding canonical map and labeled floor plan, on which the labeled localized poses with frequency of 30Hz are generated using adaptive Monte-Carlo Localization (AMCL). We use the canonical map and the canonical map poses to generate topological maps, one for each sequence. We used $1.0$m as the desired separation between place nodes when generating topological maps. We trained and tested our methods mostly on the Stockholm sequences as the building in Stockholm has much larger number of rooms and bigger in scale.
+
+\begin{table}[h!]
+\centering
+ \begin{tabular}{|l|c|c|c|} 
+ \hline
+  & Stockholm & Freiburg & Saarbrucken \\ [0.5ex] 
+ \hline
+ \# sequences & 42 & 26 & 32 \\ 
+ \hline
+ \# floor plans & 4 & 3 & 4 \\
+ \hline
+ Avg. \# topological map nodes per sequence & 103.62 & 66.12 & -\footnote{We did not generate topological maps for the Saarbrucken sequences.} \\
+ \hline
+ Avg. \# topological map edges per sequence & 159.90 & 104.86 & - \\
+ \hline
+ \end{tabular}
+ \caption{Details of the dataset}
+ \label{table:dataset}
+\end{table}
 
 \subsection{Methodology}\label{section:method}
-\subsubsection{Experiments for Grid-Based Approach}\label{section:exp-grid}
-\subsubsection{Experiments for Template-Based Approach}\label{section:exp-tmpl}
+\subsubsection{Software}
+We used LibSPN \cite{pronobis2016learning}, a Python library that implements learning and inference with SPNs on GPUs. This library provides the functionality to generate a dense SPN structure using the random-decomposition method as described in section \ref{sc:rand}. We use this functinoality to generate SPN on top of a place grid as well as on templates. We implemented ourselves weight-sharing and instance-specific full SPN construction as needed for the template-based method. 
+
+\subsubsection{Experiments for Place Grid Method}\label{section:exp-grid}
+
+\paragraph{Setup} We converted topological maps from Stockholm sequences into place grids. We used place grids of size of 15 rows by 10 columns with resolution of 1.5m per cell. The resolution is lower than the 0.8m of desired place separation in topological map to ensure the connectivity of places when mapped to the grid, as suggested in section \ref{sc:avoidgaps}. Since the size of our dataset is not very large, we lowered the number of place categories to four: doorway, corridor, small office, and large office. so that we can better assess the learning of structure and dependency.
+
+To verify the consistency of the place grid method,  we used cross-validation by training the network on three floors and test it on the other one, for each combination of the four floors in the Stockholm dataset.
+
+We did not implement the rotation-invariant SPN when testing the place grid method, as the canonical maps in the Stockholm dataset have the same orientation, and the topological map data examples are aligned well with each other. In the future, we plan to let the SPN learn the topological maps from two datasets (e.g. Stockholm and Freiburg) and test it on another (e.g. Saarbrucken), and implement the rotation-invariant SPN.
+
+\paragraph{Tasks} We test the method by using it for two main types of tasks, map completion and novel map structure detection. For map completion, we use the SPN to do MPE inference for the full map and the occluded part of the map. Also, we randomly occlude cells in the place grid that may or may not have been mapped directly from the topological maps, and test if the network can infer their values correctly. For novel structure detection, we construct test examples of topological maps by swapping the labels of pairs of classes, such as doorway and corridor, large office and small office, and small office and corridor.
+
+\subsubsection{Experiments for Template-Based Method}\label{section:exp-tmpl}
+
+\paragraph{Setup} As described in section \ref{section:tmpl}, during training, we train an SPN for a single template, or a hierarchy of templates. Therefore, we created a dataset where each example is an assignment of the template variables. We do this by partitioning the available topological maps using the templates. The partition operation is done 10 times for each topological map, to capture different combinations of nodes.
+
+During testing, we partition the given topological map test instance by our templates, and construct a full SPN for this instance. We let the weights of the sub-SPNs that model templates shared.  To ensure that different combinations of nodes are captured, the full SPN is constructed over two different partitions of the test graph. The full SPN is created by using a product node over all the templates, as doing so unions the scope of the variables (i.e. nodes). To ensure completeness of the full SPN, the sub-SPN for each partition needs to cover all the nodes in the topological map. Since there are nodes that are covered by during each partition operation, we initialize another SPN with dense structure which simply takes all unused nodes as inputs with zero weights. As shown in figure \ref{fig:drop}, the number of uncovered nodes drops quickly as the number of partitions is attempted for a graph instance.
+
+Besides, since we are ignoring several place categories such as kitchen and meeting room, there is a significant amount of nodes that would be all labeled unknown (the default label). Therefore, we test both cases of ignoring and not ignoring the unknown class during construction of topological maps examples.
+
 \subsection{Results}\label{section:results}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
