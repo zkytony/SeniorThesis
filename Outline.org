@@ -1,0 +1,74 @@
+Outline of my thesis. I list the points I need to make.
+
+* Introduction
+** Introduce the grand goal of this research
+   Towards autonomous mobile robots that exhibit complex behaviors in human-populated environments. Mention these ideas:
+   - Set the tone by briefly summarize the progress of robotics research in the past & potential in the next few decades.
+   - Describe current state of mobile robot applications and their limitations.
+   - Describe briefly the scope of this paper: Indoor mobile robots.
+
+** Introduce the necessity of environment understanding
+   Essentially: learning a comprehensive spatial representation is
+   1. Addressing one important limitation.
+   2. Foundation for the robot to be able to plan and act with more complexity.
+
+** Introduce topological map as a layer of spatial knowledge representation
+   - Define topological map in one sentence.
+   - Introduce Deep Affordance Spatial Hierarchy. Discuss very briefly the layers. Emphasize the topological layer.
+
+** Introduce the goals of this thesis
+   - Describe birefly what does "model a topological map" mean: Learning the structure of the large-scale space and dependency between places (i.e. how does the presence of a group of places influence the attributes of other places.)
+   - Discuss briefly the lack of research to model a topological map today.
+   - Describe the challenges:
+     1. Large-scale. There is no limitation of how large the given topological map is.
+     2. Varying sizes and shapes (including rotation). 
+     3. Lack of data. There is not much topological map data that are available.
+     4. Because we aim to use SPN to build a unified network, we need to use SPN to model the topological map, essentially a sparse, undirected graph. There is no existing algorithm or method that does this.
+   - Describe the constraints for this research: Lack of data --> the trained model only deals with four classes of place categories: doorway, corridor, small office, and large office.
+
+** Describe briefly the contributions of this thesis (say a few words on possible applications)
+   - Major contributions:
+     1. Presented two methods (or strategies) to use SPN to model a graph.
+     2. Enable robots to do inference of environment attributes at global-scale.
+
+   - Side contributions:
+     1. Collected a large dataset.
+
+** Summarize experiments and results
+   - Mention briefly about data collection. 
+   - Use general words to summarize the kinds of experiments conducted and results.
+     1. Place grid experiments:
+	- completion (various kinds. Including: full completion, partial completion, and inferring missing place categories in the grid of topological map.
+	- novel structure detection (swap room classes)
+     2. Template based method experiments:
+        - Infering missing room classes template-wise. (Compare hierarchical vs pure template)
+        - Infering missing room classes for full topological maps. (Compare hierarchical vs pure template)
+	- (Potentially) Connecting templates to low-level representation SPNs.
+	- (Potentially) Correct room classification based on surrounding room categories and their likelihoods. [Probably not done before June 1st.]
+     
+** Thesis outline
+
+* Related Works
+** Indoor spatial knowledge representation & learning, topological maps
+** Graph modeling machine learning techniques
+
+* Background
+** Sum-Product Networks (detailed)
+** Deep Affordance Spatial Hierarchy
+** Topological Maps
+
+* Problem Statement
+
+* Proposed Solutions
+** Grid-Based Approach
+** Template-Based Approach
+
+* Experiments
+** Data collection
+** Methodology.
+** Experiment #1: Testing the place grid method.
+** Experiment #1: Testing the template-based method.
+
+* Conclusion & Future work
+
+* Acknolwedgement

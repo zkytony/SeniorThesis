@@ -3,6 +3,7 @@
 \usepackage[top=1.25in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
 \usepackage{pgf}
 \usepackage{tikz}
+\usepackage{subfiles}
 
 \usepackage{multicol}
 \usepackage{enumitem}
@@ -11,8 +12,6 @@
 \subsubsectionfont{\small}
 \usepackage{listings}
 \usepackage{changepage}
-
-\usepackage{utopia}
 
 \usepackage[linesnumbered,ruled]{algorithm2e}
 
@@ -66,49 +65,12 @@
 
 \begin{document}
 
+\subfile{titlepage.tex}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Title Page
+% For ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{titlepage}
-\centering
-\topskip0pt
-\vspace*{\fill}
-  \huge Learning Large-Scale Topological Maps Using Sum-Product Networks\normalsize
-
-  \vspace{0.5in}
-
-  \Large Kaiyu Zheng\large
-
-  \vspace{2in}
-
-  A thesis submitted in partial fulfillment of the requirements for the degree of
-
-  \vspace{0.1in}
-
-  Bachelor of Science with Departmental Honor
-
-  \vspace{0.8in}
-  University of Washington
-
-  2017
-
-  \vspace{0.4in}
-  Advisors
-
-  Dr.~Andrzej Pronobis
-
-  Prof.~Rajesh Rao
-
-  \vspace{0.8in}
-  Program Authorized to Offer Degree:
-
-  \vspace{0.1in}
-
-  Paul Allen's School of Computer Science \& Engineering\normalsize
-\vspace*{\fill}
-
-\end{titlepage}
-
+\newpage
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Abstract
@@ -120,14 +82,14 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % List of Figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\listoffigures
+%% \newpage
+%% \listoffigures
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % List of Tables
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\listoftables
+%% \newpage
+%% \listoftables
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Table of Contents
@@ -141,93 +103,400 @@
 \newpage
 \pagenumbering{arabic} % Switch to normal numbers
 \section{Introduction}
-The foundamental motivation of robotics is two-fold. First, robots can take risks in the place of humans, do what humans cannot or struggle to do. Second, robots can assist humans to achieve their goals more efficiently and effectively. The continuing favor of machines in the last several decades saw an explosion of interest and investment in robotics both in commercial applications and academic research \cite{pagliarini2017future}. With little doubt, one of the significant directions of continuously heavy research is on autonomous robots. In this paper, we consider a subfield of autonomous robots, which is that of mobile robots in indoor environments. Mobile robots are desirable to meet both aspects of the motivation, especially the second; They have the potential to provide various kinds of services, and recently attempts has been made to apply mobile robots to real-world problems such as helping older people \cite{jayawardena2010deployment}, guiding passengers in airports \cite{triebel2016spencer}, and telepresence \cite{matsuda2016scalablebody}. However, these robots are still far away from fully autonomous, and can only perform limited actions with specially designed tasks.
+The fundamental motivation of robotics is two-fold. First, robots can take risks in the place of humans, do what humans cannot or struggle to do. Second, robots can assist humans to achieve their goals more efficiently and effectively. The continuing favor of machines in the last several decades saw an explosion of interest and investment in robotics both in commercial applications and academic research \cite{pagliarini2017future}. With little doubt, one of the directions of continuously heavy research is autonomous robots. In this paper, we consider a subfield of autonomous robots, which is that of mobile robots in indoor environments. Mobile robots are desirable to fulfill both aspects of the motivation, especially the second; They have the potential to provide various kinds of services, and recently attempts have been made to apply mobile robots to real-world problems such as helping older people \cite{jayawardena2010deployment}, guiding passengers in airports \cite{triebel2016spencer}, and telepresence \cite{matsuda2016scalablebody}. However, these robots are still far from fully autonomous, and only perform limited actions with specially designed tasks.
 
-To enable autonomous mobile robots to exhibit complex behaviors in indoor environments, it is crucial for them to form an understanding of the environment, that is, to gather and maintain spatial knowledge. The framework that organizes this understanding is called the spatial knowledge representation. Additionally, it is also crucial for the robots to be able to learn about the spatial knowledge representation. In this paper, for spetial knowledge representation, we use the Deep Affordance Spatial Hierarchy (DASH) \cite{pronobis2017deep}, a recently proposed hierarchical representation that spans from low-level sensory input level layer to high level human semantics layer. Specifically, in this paper, we devote our time on learning the layer of a topological map, which is a graph that contains information of places and their connectivity for a given full floor map.
+To enable autonomous mobile robots to exhibit complex behaviors in indoor environments, it is crucial for them to form an understanding of the environment, that is, to gather and maintain spatial knowledge. The framework that organizes this understanding is called the spatial knowledge representation. Additionally, it is also crucial for the robots to be able to learn about the spatial knowledge representation in a probabilistic manner. In this paper, we use the Deep Affordance Spatial Hierarchy (DASH) \cite{pronobis2017deep}, a recently proposed hierarchical spatial representation that spans from low-level sensory input layer to high-level human semantics layer.  The ultimate goal of our research is to use a unified deep generative model to capture all layers of DASH, an approach fundamentally different from the traditional where an assembly of independent spatial models exchange information in a limited way \cite{pronobis2016learning}. 
+Specifically, in this paper, we devote our time on learning the layer of topological map, a mainstream graphical representation of the information of places and their connectivity for a full floor map \cite{remolina2004towards}.  We have chosen to use sum-product networks (SPN) \cite{poon2011sum}, a new class of deep probabilistic models. It is favorable for our purpose primarily because of three reasons. First, it is a deep generative model, therefore probabilistic by nature. Second, it allows tractable training and inference time with respect to the size of the network. Third, it is simple to combine multiple SPNs into one, unified SPN with interpretable layers, which matches our purpose nicely.
 
+Learning a topological map means learning the structure of the large-scale space and dependency between places, for example, how the evidence of a group of places influence the attributes of other places. This is an important step towards planning complex actions in the environment. By itself, it is also useful for tasks such as inferring missing information of a place based on the surrounding places. In the context of DASH, it is can be used for correcting the classification results of the local environment model\footnote{In DASH, above the layer of low-level sensory input, there is a layer called ``peripersonal layer'' which converts sensory input into robot-centric representation of the immediate surroundings, i.e. local environment. More details about DASH is given in section \ref{section:dash}.}. Although there has been considerable effort in the extraction of topological maps \cite{ranganathan2011online}\cite{shi2010online}\cite{tomatis2003hybrid}, only a few work is done to actually learn it with semantic information in the past two decades \cite{aydemir2012can}\cite{mozos2006supervised}, and we have not found any work on learning topological maps probabilisticly to allow inference.
 
+%\subsection{Challenges}
 
+There are three main challenges in this work. First, the topological maps have varying sizes (number of places and connections), and they may be rotated arbitrarily, because the underlying environment may have different dimensions, and there is essentially no loss of dependency information if a topological map is rotated as a whole. Second, there is no existing method that uses SPN to model\footnote{In this paper, ``modeling'' a topological map means the same as ``learning'' it.} the topological map, essentially a sparse, undirected graph. Third, there is not much available data with annotated floor plans and raw robot sensory readings with which we can create a dataset of topological maps. 
+
+%\subsection{Contributions}
+
+We address the above challenges through our contributions. We present two methods to use SPN to model a topological map: the place grid method, and the template-based method. Both methods aim to deal with the variability of topological maps but with different emphasis on the dependency between places. In the place grid method, we project the topological map onto a grid of fixed size, and generate a SPN structure using random decomposition of the grid. In the template-based method, we train an SPN on a template, or a hierarchy of templates. Each template is a basic graph structure that is assumed to prevail in the topological map. For each topological map instance, we construct an instance-specific full SPN using the template SPNs as children, and do inference on the full SPN. To our knowledge, these are the first methods to use SPN to model a sparse graph. We evaluate the two methods by experiments and our results show their capability of enabling robots to do inference of environment attributes with promising output, showing the understanding of the spatial relations between places. In addition, we created a large dataset with fully annotated localization, sensory information and virtual scans, a low-level geometry representation of robot-centric environment\footnote{We plan to publish this dataset to IJRR soon.}. This dataset is used to evaluate our methods.
 
 \subsection{Thesis outline}
+
+\paragraph{Section \ref{section:related} - Related Works} We review related works in the use of topological maps as a part of spatial knowledge, learning of topological maps, and recent machine learning techniques used to model graphs.
+
+\paragraph{Section \ref{section:background} - Background} We discuss details about the theoretical background related to our work. First, we describe details of sum-product networks. Then, we present an overview of the Deep Affordance Spatial Hierarchy. Finally, we formalize the notion of topological map and describe the method we use to extract topological maps.
+
+\paragraph{Section \ref{section:sol} - Problem Statement \& Proposed Solutions} We formalize the problem that we try to solve in this thesis. Then, we describe the details of the two presented methods that model topological maps using SPNs: the place grid method and the template-based method.
+
+\paragraph{Section \ref{section:experiment} - Experiments} We describe the dataset, methodology, and results of our experiments.
+
+\paragraph{Section \ref{section:conclusion} - Conclusion \& Future Work} We conclude our thesis by providing a summary of the presented methods and experiment results. Finally, we discuss improvements to be made in the future.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Related Works
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Related Works}
+\section{Related Works}\label{section:related}
+
+The use of topological map in navigation and mapping dates back to the work by Kulpers and Byun \cite{kuipers1991robot} in 1991, where they first considered the use of qualitative maps to avoid error-prone geometrically precise maps. Topological maps then began to be considered as a form of spatial knowledge \cite{kuipers2000spatial}. More recently, Beeson et.~al.~\cite{beeson2010factoring} proposed a hybrid approach of spatial knowledge representation that uses metrical representation for local environment and topological representation for large environment. Pronobis et.~al.~\cite{pronobis2010representing} outlined criteria for good spatial knowledge representation where the use of topological map to represent global environment is also promoted.
+
+Aydemir et.~al.~\cite{aydemir2012can} investigated the statistical properties of indoor environments by analyzing two large floor plan datasets consisting of over 197 buildings and 38,000 rooms in total. They pointed out that indoor environments are not yet well understood. They discovered that local complexity remains unchanged for growing global complexity in real-world indoor environments. This finding provides important statistical support for our template-based method discussed later. They also proposed two methods for predicting room categories for a given topological map, but their methods rely on the maintenance of a large dataset of possible graphs, and do not involve learning of the actual topological map. In contrast, our methods can learn the dependency of place categories from a limited amount of data.
+
+Sum-product networks (SPNs), proposed by Poon and Domingos \cite{poon2011sum} are a new class of probabilistic model that guarantee tractable inference. Despite their competitive or state-of-the art results on tasks such as image completion \cite{poon2011sum}, image classification \cite{gens2012discriminative}, and language modeling \cite{cheng2014language}, the advantages of SPNs have not been exploited much in robotics, besides \cite{pronobis2016learning}. Moreover, for neural networks, the problem of learning from data naturally structured as graphs has been on the radar for around a decade. Scarselli et.~al.~\cite{scarselli2009graph} proposed graphical neural networks, and recently there is an increase of intererst for generalizing convolutional neural networks (CNNs) beyond grid data such as images to model data in graph domains \cite{defferrard2016convolutional}\cite{kipf2016semi}, showing promising progress. In contrast, there has been no research on using sum-product networks to learn similar data. This work offers a straightforward first step in broadening the scope of applications for SPNs.
+
+
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Background
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Background}
-\subsection{Sum-Product Networks}
-\subsection{Deep Affordance Spatial Hierarchy}
-\subsection{Topological Maps}
+\section{Background}\label{section:background}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Problem Statement
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section{Problem Statement}
+\subsection{Sum-Product Networks}\label{section:spn}
+
+\subsubsection{Definitions and Properties}
+
+SPN, proposed by Poon and Domingos \cite{poon2011sum}, is a new class of probabilistic graphical models with built-in properties that allow \textit{tractable} inference, a major advantage over traditional graphical models such as Bayesian networks. The idea is built upon Darwiche's work on network polynomial and differentials in arithmetic circuit representation of the polynomial \cite{darwiche2003differential}. Here, I provide the definition of SPN and several of its key properties.
+
+\begin{definition}[SPN]
+\cite{poon2011sum}
+Let $\mathcal{X}=\{X_1,\cdots X_n\}$ be a set of variables. A sum-product network (SPN) defined over $\mathcal{X}$ is a rooted directed acyclic graph. The leaves are indicators $[X_p= \cdot ]$. The internal nodes are sum nodes and product nodes. Each edge $(i,j)$ from sum node $i$ has a non-negative weight $w_{ij}$. The value of a sum node is $\sum_{j\in Ch(i)}w_{ij}v_j$, where $Ch(i)$ is the children of $i$. The value of a product node is the product of the values of its children. The value of an SPN is the value of its root.
+\end{definition}
+
+We use $S$ to denote an SPN as a function of the indicator variables (i.e. the leaves). Let $\mb{x}$ be an instantiation of the indicator variables, a full state. Let $\mb{e}$ be an evidence (partial instantiation). For a given node $i$, we use $S_i$ to denote the sub-SPN rooted at $i$. Also, we use $x_{p}^a$ to mean $[X_p=a]$ is true, and use $\bar{x}_p^a$ to mean the negation, for simplicity. We define the following properties of SPN.
+
+\begin{definition}[Validity]
+An SPN is \textit{valid} if and only if it always correctly computes the probability of evidence: $S(\mb{e})=\Phi_S(\mb{e})$, where $\Phi_S(\mb{e})$ is the unnormalized probability of $\mb{e}$.
+\end{definition}
+
+\begin{definition}[Consistency]
+An SPN is \textit{consistent} if and only if for every product node $i$, there is no variable $X_p$ that has indicator $x_p^a$ as one leaf of the sub-SPN $S_i$ and indicator $x_p^b$ with $b\neq a$ as another leaf.
+\end{definition}
+
+\begin{definition}[Completeness]
+An SPN is \textit{complete} if and only if all children of the same sum node have the same scope. (The scope of an SPN is the set of variables in $\mathcal{X}$ that the indicators of an SPN are defined on.)
+\end{definition}
+
+\begin{definition}[Decomposability]
+An SPN is \textit{decomposable} if and only if the children of every product node have disjoint scopes.
+\end{definition}
+
+The above definitions can constrain an SPN so that it is no longer an arbitrary multi-linear map from the indicators to a real number. Poon and Domingos proved that if an SPN is complete and consistent, then it is valid \cite{poon2011sum}. A more restricted theorem for validity is that if an SPN is complete and decomposible, then it is valid \cite{peharz2015theoretical}. We will apply the latter theorem in to solve our problem, since it is easier to guarantee that the children of a product node have disjoint scopes.
+
+\paragraph{Hidden Variables}
+Given a complete and consistent SPN $S$ and an arbitrary sum node $i$, we know:
+\begin{equation}
+S_i(\mb{x})=\sum_{j\in Ch(i)}w_{ij}S_j(\mb{x})
+\end{equation}
+If $\sum_{j\in Ch(i)}w_{ij}=1$, we can view the value of the sum node $i$ as summing out a hidden variable $Y_i$, where $P(Y_i=j)=w_{ij}$. Also, in this case, the partition function $Z_S=S(1\cdots1)=\sum_{\mb{x}}S(\mb{x})$=1, because all of the indicators have value 1, and the product nodes and sum nodes all output 1. It follows that the value of every sub-SPN is a normalized probability. Therefore, the SPN rooted at sum node $i$ can be viewed as a mixture model, where each child $j$ is a mixture component with distribution $S_j(\mb{x})$.
+
+\subsubsection{Inference}\label{inf}
+We can perform marginal inference and MPE inference with a valid SPN in time linear to its size. This uses the same idea as Darwiche's derivation of partial differentiations in arithmetic circuits \cite{darwiche2003differential}.
+
+Given an SPN $S$ and an arbitrary intermediate node $i$, let $S_i(\mb{x})$ be the value of the node on state $\mb{x}$. Let $Pa(i)$ be the parent nodes of $i$. Then,
+
+\begin{equation}
+\label{psx}
+    \frac{\partial S(\mb{x})}{\partial S_i(\mb{x})}= \sum_{k\in Pa(i)}\frac{\partial S(\mb{x})}{\partial S_k(\mb{x})} \frac{\partial S_k(\mb{x})}{\partial S_i(\mb{x})}
+\end{equation}
+If node $i$ is a product node, $\frac{\partial S_k(\mb{x})}{\partial S_i(\mb{x})}=w_{ki}$. If node $i$ is a sum node, $\frac{\partial S_k(\mb{x})}{\partial S_i(\mb{x})}=\prod_{l\in Ch_{-i}(k)}S_l(\mb{x})$. We can compute $\frac{\partial S(\mb{x})}{\partial S_k(\mb{x})}$ by first going upwards from leaves to root then going downwards from root to node $i$. 
+
+\paragraph{Marginal inference}\label{if:mg}
+Suppose node $i$ is an indicator $x_p^a$. Then, as derived in \cite{darwiche2003differential},
+
+\begin{equation}
+P(X_p=a|\mb{e})=\frac{1}{S(\mb{e})}\frac{\partial S(\mb{e})}{\partial S_i(\mb{e})}\propto\frac{\partial S(\mb{e})}{\partial S_i(\mb{e})}
+\end{equation}
+We can also infer the marginal of hidden variables. Suppose node $i$ is a sum node which marginalizes out a hidden variable $Y_i$. For child $j$ branching out from $i$, we can consider the value of indicator $[Y_i=j] = S_j(\mb{e})$. This holds because the indicators are actually real-valued \cite{darwiche2003differential}\cite{peharz2015theoretical}, and this is important when we take the derivative with respect to an indicator \cite{peharz2015theoretical}. Thus, we use the partial differentials derived by Darwiche \cite{darwiche2003differential} to obtain the following. Note that by definition, $\mb{E}$ and $\mb{Y}$ must be disjoint.
+\begin{equation}\label{eq:pyi}
+P(Y_i=j, \mb{e})=\frac{\partial S(\mb{e})}{\partial S_j(\mb{e})}
+\end{equation}
+\begin{equation}
+  \begin{aligned}
+    P(Y_i=j|\mb{e})= \frac{P(Y_i=j, \mb{e})}{P(\mb{e})} &= \frac{1}{S(\mb{e})}\frac{\partial S(\mb{e})}{\partial S_j(\mb{e})}\\
+    &= \frac{1}{S(\mb{e})}\frac{\partial S(\mb{e})}{\partial S_i(\mb{e})}\frac{\partial S_i(\mb{e})}{\partial S_j(\mb{e})}\\
+    &=\frac{w_{ij}}{S(\mb{e})}\frac{\partial S(\mb{e})}{\partial S_i(\mb{e})}\\
+    &\propto w_{ij}\frac{\partial S(\mb{e})}{\partial S_i(\mb{e})}
+  \end{aligned}
+\end{equation}
+
+
+\paragraph{MPE inference}\label{if:map}
+The task of MPE inference is to find the most likely assignment of unobserved variables given the evidence. Suppose we have evidence $\mb{e}$ for a set of observed variables $\mb{E}$, we have hidden variables $\mb{Y}$, and we have the unobserved input variables $\mb{X}=\mathcal{X}-\mb{E}$. We are computing $\argmax_{\mb{x},\mb{y}}P(\mb{x},\mb{y}|\mb{e})$.
+
+
+This can be done by replacing each sum operation with a maximization operation, such that $S_i(\mb{e})=\max_{j}w_{ij}S_j(\mb{e})$. First, we compute $S_i(\mb{e})$ for every node from bottom to top. Next, we traverse recursively from the root to the leaves: At a sum node, we pick its child that led to the value of that sum node; At a product node, we select all of its children for traversal. 
+
+If $S$ is consistent, it is guaranteed that there is no conflicting values among the children of a product node, which means that the MPE result is a valid instantiation of the variables. In this case, the obtained instantiation $\hat{\mb{x}}$ has the maximum value of $S(\hat{\mb{x}}|\mb{e})$ \cite{poon2011sum}.
+
+\subsubsection{Learning Parameters}
+
+\paragraph{Gradient descent and backpropagation} Suppose $S$ is a valid SPN over the set of variables $\mathcal{X}$, and suppose $w_{ij}$ represents the weight of the edge from sum node $i$ to its $j$-th child. Suppose we have observations of states $\mb{x}=\{\mb{x}_1,\cdots,\mb{x}_n\}$. We aim to estimate the weights $\mb{w}$ by maximizing the log-likelihood function:
+\begin{equation}
+l(\mb{w}|\mb{x})=\sum_{p=1}^{n}logP_{\mb{w}}(\mb{x}_p)=\sum_{p=1}^{n}log\Big(\frac{S(\mb{x}_p)}{Z}\Big)
+\end{equation}
+where $Z$ is the partition function that equals to $S(1\cdots1)$. The second equal sign holds because $S$ is valid. Now we take the gradient with respect to a single weight $w_{ij}$:
+\begin{equation}
+\label{dl}
+\frac{\partial l(\mb{w}|\mb{x})}{\partial w_{ij}}=\sum_{p=1}^{n}\frac{\partial}{\partial w_{ij}}log\Big(\frac{S(\mb{x}_p)}{Z}\Big)=\sum_{p=1}^{n}\frac{1}{S(\mb{x}_p)}\frac{\partial S(\mb{x}_p)}{\partial w_{ij}}-\sum_{p=1}^{n}\frac{1}{Z}\frac{\partial Z}{\partial w_{ij}}
+\end{equation}
+The value of the sum node $i$ is $S_i(\mb{x}_p)=\sum_{j\in Ch(i)}w_{ij}S_j(\mb{x}_p)$. We can thus use the chain rule to obtain:
+\begin{equation}
+\frac{\partial S(\mb{x}_p)}{\partial w_{ij}} = \frac{\partial S(\mb{x}_p)}{\partial S_i(\mb{x}_p)}\frac{\partial S_i(\mb{x}_p)}{\partial w_{ij}}=\frac{\partial S(\mb{x}_p)}{\partial S_i(\mb{x}_p)}S_j(\mb{x}_p)
+\end{equation}
+Using (\ref{psx}), we can compute $\partial S(\mb{x}_p)/\partial S_i(\mb{x}_p)$ by first computing the partial derivative with respect to the parents of $i$. Computing $\partial Z/\partial w_{ij}$ follows similar derivation. This is naturally a backpropagation process. Alternatively, we can ensure that $S(\mb{x}_p)$ to be a normalized probability by renormalizing the weights after each full update, so that we can discard the $Z$ in the derivation.
+
+\paragraph{Hard EM} As discussed previously, a sub-SPN rooted at sum node $i$ in an SPN $S$ can be viewed as a mixture model. 
+%% We have discussed hidden variables the sum node $i$ implicitly marginalizes out when $\sum_{j\in Ch(i)}w_{ij}=1$. To estimate the model parameters $\mb{w}$, EM is a natural choice in this situatinoro. I attempt to derive the EM for SPN weight update in appendix \ref{apdx:spn}.
+%\paragraph{Hard EM}
+Poon and Domingos found that their EM method does not work well in practice, so they opt to use MPE inference instead of the marginal inference in the E step, and changes the M step accordingly. The algorithm can be described as follows.
+
+\begin{enumerate}
+    \item[(1)] In E step, compute MPE inference:
+        \begin{equation}
+        j^*=\argmax_j P(\mb{x}_p, Y_i=j)=\argmax_j\frac{\partial S(\mb{x}_p)}{\partial S_j(\mb{x}_p)}=\argmax_j w_{ij}\frac{\partial S(\mb{x}_p)}{\partial S_i(\mb{x}_p)}
+        \end{equation}
+        A count is kept for every child of the node $i$ to record the number of times the index of that child equals to $j^*$.
+        
+    \item[(2)] In M step, the count of child $j^*$ increments by one.
+\end{enumerate}
+
+\subsubsection{Learning Structure}
+
+\paragraph{LearnSPN}
+The most commonly used structure learning algorithm is LearnSPN \cite{gens2013learning}. This algorithm recursively divides up the training data either by rows (instances) or columns (features). A product node is added when the variables can be partitioned into approximately independent subsets. If this is not the case, the instances are partitioned into similar subsets, and sum node is added on top of the subsets. This algorithm requires a large amount of training data to yield good partition results. This is not very feasible in our problem because there is very little data for the topological maps and it is difficult to acquire a massive amount of such data.
+
+\paragraph{Random-Decomposition}\label{sc:rand}
+We use a different approach in learning the SPN structure, similar to the one used in \cite{pronobis2016learning}. This algorithm is visualized in figure \ref{fig:grid_learn}. Given a set of variables $\mathcal{X}$, we decompose it into random subsets multiple times. A sum node is used to model a mixture of these decompositions, summing up the output of SPNs built upon each of these decompositions. This process is done recursively for each subset until singleton. Product nodes combine the output of the SPNs on each subset to union their scopes. Weights are shared for each sum node at the same level, and edges with zero weight are pruned once the parameter learning is finished.
+
+\subsection{Deep Affordance Spatial Hierarchy}\label{section:dash}
+
+Pronobis et.~al.~\cite{pronobis2017deep} proposed a hierarchical spatial representation named Deep Affordance Spatial Hierarchy (DASH). In their work, they also discussed the properties of a desired representationI summarize these properties as follows: 
+
+\begin{enumerate}[label=(\arabic*)]
+    \item Minimal;
+    \item Hierarchical (It allows long-term, high-level, global planning to break down to short-term, lower-level local planning);
+    \item Correlating abstraction with information persistence (more dynamic means less persistent, which requires higher level of abstraction);
+    \item Probabilistic;
+    \item Representing the unknowns;
+\end{enumerate}
+
+\noindent Guided by the above principles, the authors showed DASH, which aims to be used by deep learning frameworks. DASH consists of four layers.
+\begin{enumerate}[label=(\arabic*)]
+    \item Perceptual layer represents the robot's raw sensor readings. In the paper, the authors used occupancy grid to represent the laser-range observations, centered at the robot's position.
+    \item Peripersonal layer represents objects, obstacles, and landmarks in the space immediately surrounding the robot. The authors used a polar occupancy grid representation which is a simplification of this layer's information.
+    \item Topological layer represents the graphical structure of the map that connects places together. It maintains information of the places, including the eight views of a place, and the connectivity between places. It also contains placeholders. In the paper, a topological map is constructed from first sampling places in a window centered at the robot, according to the probability distribution $P(E|G)$, where $E$ is the variable for existance of places, and $G$ is the perceptual\footnote{I think this should be peripersonal, from the polar occupancy grid. But there is little difference between the first two layers due to the simplification in the peripersonal layer.} occupancy grid. Then, according to navigation affordance, places reachable from the robot are added. The affordance is determined by A* search over the potential field $P(E|G)$. 
+    \item Semantic Layer represents human concepts about the places, such as place categories. The knowledge represented in this layer can be used for complex human-robot interaction tasks. In the paper, the authors implemented a probabilistic relational data structure but the details are not shown.
+\end{enumerate}
+When the robot is handed with a DASH, ideally it is supposed to be able to navigate around and complete tasks that involve interaction with humans. And the robot should be able to explore the environment and build up the topological layer on its own. However, it does not have the ability to model uncertainty in the environment, and infer semantics of placeholders or other latent variables. To enable this, the authors used DGSM (Deep Generative Spatial Model) \cite{pronobis2016learning} to represent the default knowledge about the environment. Default knowledge can be understood as the knowledge that the system assumes before it is provided explicitly. In the context of the paper, default knowledge means place semantics that the model infers for all places (including placeholders) based on its training data. DGSM is an architecture that essentially connects the four layers together, with sensory readings as input, and semantics as output. 
+
+\subsection{Topological Maps}\label{section:topomap}
+
+A topological map is a graph that captures the overall geometry of the map as well as important places in the map. In the context of robotics, the nodes in this graph are the places accessible by the robot, and edges indicate connectivity between places, i.e. the feasibility of navigating from one place to another. Figure \ref{fig:topomap} shows examples of simplified topological maps.
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.5]{images/example_place_maps.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+Pronobis et.al. \cite{pronobis2017deep} propose a framework of spatial knowledge representation, called Deep Affordance Spatial Hierarchy (DASH), in which topological map is used as a layer to capture the geometry of the map and connectivity between places. They describe a mapping algorithm that builds a topological map. As the robot explores an environment, the mapping algorithm expands the topological map by adding \textit{placeholders} \cite{pronobis2010representing} as nodes, according to a probability formulation as follows
+\begin{equation}\label{eq:p_eg}
+  P(E|G) = \frac{1}{Z}\prod_i\phi_I(E_i)\phi_N(E_i, \mathcal{E})
+\end{equation}
+where $P(E|G)$ is the probability of placeholder locations $E$ given robot-centered occupancy grid $G$ which represents laser-range observations. The potential function $\phi_I(E_i)$ models the existence of placeholder at location $i$, denoted as $E_i\in\{0,1\}$\footnote{For details about how $\phi_I(E_i)$ is defined, refer to the original paper \cite{pronobis2017deep}.}. The potential function $\phi_N(E_i, \mathcal{E})$ models the probability of placeholder $E_i$ in the neighborhood of the set of existing places $\mathcal{E}$. It is defined as
+\begin{equation}\label{eq:phi_n}
+  \phi_N(E_i, \mathcal{E}) = \sum_{p\in\mathcal{E}}\exp\Big(-\frac{(d(i,p)-d_n)^2}{2\sigma^2}\Big)
+\end{equation}
+where $d(i,p)$ is the distance between location $i$ and place $p$. The key point to note here is that $\phi_N(E_i, \mathcal{E})$ promotes places that are of certain distance $d_n$ apart from existing places. This fact is important when we describe the place grid method in section \ref{section:grid}.
+
+\subsubsection{Challenges}
+There are several challenges in modeling topological maps due to their scale and variability. A full map of a workspace may contain dozens of nodes and hundreds of edges. The number of places in one map likely differs from that in another. Different topological maps may represent environments of different dimensions. The structure of places in one map may appear very differently compared to another. Even for similar environments, the topological maps may be rotated differently, because rotation does not lose information in a topological map. 
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Proposed Solutions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section{Proposed Solutions}
-\subsection{Grid-Based Approach}
-\subsection{Template-Based Approach}
+%\newpage
+\section{Problem Statement \& Proposed Solutions}\label{section:sol}
+\subsection{Problem Statement}\label{section:problem}
+\subsection{Place Grid Method}\label{section:grid}
+To address the challenge that topological maps are of different sizes and shapes, we present a simple idea which is to map them to fixed-size grids. A grid can be considered as a generic representation of topological maps. It approximates the topological map, but preserves most of the adjacency relations between places. It is straightforward to use SPN to model this grid, using the algorithm in \ref{sc:rand}, and thus indirectly model topological maps as a whole. 
+
+\subsubsection{From Topological Map to Place Grid}
+
+In this section, I first define a \textit{place} in a topological map, then define a \textit{place grid}, and then describe in detail how can a topological map be mapped to a place grid. My definition of a place follows from the polar occupancy grid representation for local environment escribed by Pronobis and Rao in \cite{pronobis2016learning}.
+
+\begin{definition}[Place]
+A \textit{place} $p$ in a topological map is a tuple $(L, V)$ where $L$ is the location of $p$ with respect to the topological map's coordinate system, and $V$ is the robot-centric polar occupancy grid that is divided into 8 views. 
+\end{definition}
+
+\noindent An example polar occupancy grid of a place is shown in figure \ref{fig:place}.
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.5\linewidth}
+    \includegraphics[scale=0.15]{images/polar_grid.png}
+    \caption{Example place, a polar occupancy grid divided into 8 views. (Image adapted from \cite{pronobis2016learning})}
+    \label{fig:place}
+\end{figure}
+
+\begin{definition}[Place Grid]
+A place grid $G$ with resolution $r$ (meter per cell) is an $m\times n$ matrix where each cell contains a place.
+\end{definition}
+
+Given a 2D place grid $G$ with resolution $r$, we can map a place $p$ in topological map $M$ with $L=(p_x^M, p_y^M)$ to a cell in $G$ at $(p_x^G, p_y^G)$ simply by
+\begin{equation}
+  (p_x^G, p_y^G) = \Big(\floor{\frac{p_x^M-p_{x_{min}}^M}{r}}, \floor{\frac{p_y^M-p_{y_{min}}^M}{r}}\Big)
+\end{equation}
+where $p_{x_{min}}^M$ is the $x$ coordinate for the place with minimum $x$ coordinate (similar goes for $p_{x_{min}}^M$).
+
+To avoid gaps between places mapped to the grid which disturb adjacency relations between places, we can map the topological map to a place grid with resolution at most $d_n$. (Recall from equation (\ref{eq:phi_n}) that places in a topological map are separated by a predefined distance $d_n$.)
+
+To deal with the situation where multiple places map to the same cell, we can do either of the following:
+\begin{itemize}
+\item Pick the place with the highest value of $\phi_I(E_p)$, as shown in equation (\ref{eq:p_eg}). 
+\item Create a hybrid place by sampling views from these places with probability according to $\phi_I(E_p)$.
+\end{itemize}
+
+\paragraph{Example} 
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.6]{images/spn_grid.png}
+    \caption{Process of constructing a valid SPN using the random-decomposition algorithm. Each sum node models a mixture of different decompositions of the variables in its scope. Each product node unions the scopes its children by multiplying them together. The leaf (singleton) variable, in our context, is a place which can be modeled by an SPN in DGSM \cite{pronobis2016learning}.}
+    \label{fig:grid_learn}
+\end{figure}
+
+\subsubsection{Modeling a Place Grid Using Rotation-Invariant SPN}
+
+We can use the random-decomposition algorithm to construct an SPN that models a place grid, as shown in figure \ref{fig:grid_learn}. One issue with using the place grid is that two topological maps may represent similar spatial information but are rotated with respect to each other, and this leads them to map to drastically different place grids. Therefore, we need some way of dealing with the rotation of topological maps.
+
+There are multiple ways to can resolve this. We could rotate all the topological maps before hand, based on the prior knowledge that human environments typically have right angle corners and straight walls. Another way is to incorporate rotation-invariance into the SPN that models the place grid. Here, we present the construction of a rotation-invariant SPN based on a place grid.
+
+\paragraph{Rotation-invariant SPN} We consider $k$ number of major directions (e.g. 8). At the top level of the SPN, we add a max node with $k$ children of sum nodes where each sum node models the place grid for a certain orientation. Suppose one child $A$ is a grid resulted from rotating another child $B$ by angle $\theta$. Then, a cell $(x_B, y_B)$ in $B$ corresponds with (has the same value as) a cell $(x_A, y_A)$ in $A$ by the following transform:
+
+\begin{equation}
+\begin{bmatrix}
+x_B \\
+y_B \\
+\end{bmatrix}
+=
+\begin{bmatrix}
+\floor{cos(\theta)x_A+sin(\theta)y_A}\\
+\floor{-sin(\theta)x_A+cos(\theta)y_A}\\
+\end{bmatrix}
+\end{equation}
+
+With the above relation, we are not adding more inputs to the SPN. We simply connect a cell in the grid with the corresponding input for the place. There is a case where this relation causes $(x_B, y_B)$ to be out of bound, which means that there are some cells in the ``rotated'' grid $B$ that have no corresponding cells in $A$. We simply ignore the out of bound cells, and feed 1 as input for those cells that have no correspondence. One way to reduce the effect of this on the trained SPN is by using a place grid with large dimension where there are loops of cells that are supposed to be empty. The point is that these cells do not really affect the SPN's representation of the useful parts in the place grid where mapping happens.
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.6]{images/grid_method.png}
+    \caption{High-level process of the Place Grid Method. We have several place grids with different resolutions, each is modeled by an SPN using the random-decomposition algorithm. The topological maps are mapped to the grids to provide training examples for the SPNs.}
+    \label{fig:topomap}
+\end{figure}
+
+At this point, we can certainly map any topological map to grids of different resolutions, and use an SPN to model each. Lower resolution means the grid represents relations of places at a more general level. This effectively results in an ensemble of SPNs (see figure \ref{fig:topomap})). If a query concerns, for example, what category should a place at a location in the topological map be given its surroundings, we can have the ensemble of SPNs to each come up with an answer and combine them in a certain way (e.g. weighted voting) to produce the final answer. 
+
+\subsection{Template-Based Method}\label{section:tmpl}
+
+One shortcoming of the place grid method is its rely on rotation-invariant SPNs. Besides, the grid itself is in the middleground between being accurate and approximate: Althougth the grid is metric, the cells do not accurately represent the location of places. This may affect the quality of inference.
+
+To some extent, it is unnecessary to have an accurate absolute representation of the topological map, because (1) it is hard to maintain this accuracy given the variability of topological maps, and (2) topological maps are usually used in conjunction with metric grid maps for robot planning and navigation, serving as a reference for high-level planning. Therefore, we propose a template-based relative representation of the topological map, which models some certain basic structure of a graph, and expands as needed.
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.4]{images/big_graph.png}
+    \caption{Illustration of the Template-Based Method. On the left side, the three node structure is the basic structure $B$, and the pair of these basic structures is the super structure $S$, on which the SPN is constructed. On the right side, a graph instance can be partitioned into a supergraph using $B$, and the SPN essentially models the red region on the graph.}
+    \label{fig:tmpmod}
+\end{figure}
+
+Consider a \textit{basic structure} $\mathcal{B}$, such as the three-node structure in figure \ref{fig:tmpmod}. The only constraint that this structure has is the connectivity of the nodes; How the views are connected is not constrained. Therefore, this basic structure is rotation-insensitive. We can partition a given graph instance using $\mathcal{B}$. Note that $\mathcal{B}$ should be a very simple structure. One reason is that a simple structure likely occurs very often in the topological map. Another reason is that finding if a graph is a subgraph of another (subgraph isomorphism problem) is NP-complete. Linear time solution exists but only works for planar graphs \cite{eppstein1995subgraph}, and a topological map is not necessarily planar. Examples of such basic structure are shown in figure \ref{fig:basic_struct}. Algorithm \ref{alg:part_graph} is a greedy algorithm to partition the graph when $B$ is very simple. In this algorithm, \textbf{match\_graph} is assumed to be a function that is specific to $\mathcal{B}$; it could be hard-coded. The output of this algorithm is a graph $H$ where nodes are the basic structures and edges indicate their connectivity (see the green groups in figure \ref{fig:basic_struct}).
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.5]{images/example_basics.png}
+    \caption{Some simple basic structures.}
+    \label{fig:basic_struct}
+\end{figure}
+
+\begin{algorithm}
+    \caption{Graph Partition by a Basic Structure}
+    \label{alg:part_graph}
+    \SetKwInOut{Input}{Input}
+    \SetKwInOut{Output}{Output}
+
+    \underline{function Graph-Partition} $(G, \mathcal{B})$\;
+    \Input{A graph $G=(V_G,E_G)$ and a graph $\mathcal{B}$ representing a basic structure.}
+    \Output{A graph $H=(V_H,E_H)$ resulting from the partition of $G$ using $\mathcal{B}$.}
+    $V_{available}\gets V_G$\;
+    \While{$V_{available} \neq \varnothing$}{
+      $v\gets$ draw from $V_{available}$ randomly\;
+      $V_{used}\gets \mathcal{B}.$\textbf{match\_graph}$(G, v)$\;
+      \If{$V_{used}\neq \varnothing$}{
+        $V_{available}\gets V_{available} - V_{used}$\;
+        $u\gets$ a node that represents $V_{used}$\;
+        $V_H\gets V_H \cup \{u\}$\;
+        \ForEach{$v'\in V_{used} \cup \{v\}$}{
+          $E_H\gets E_H \cup (u, M.\textbf{get}(v'))$\;
+          $M.$\textbf{put}$(v', u)$\;
+        }
+      }
+      $V_{available} = V_{available} - \{v\}$\;
+    }
+    \KwRet{$(V_H, E_H)$}
+\end{algorithm}
+
+Now, consider another simple graph structure $\mathcal{S}$ that consists of $\mathcal{B}$. For example, $\mathcal{S}$ is a pair of $\mathcal{B}$ connected as shown in the red region of the topological map in figure \ref{fig:basic_struct}. We can again partition the graph $H$ by $\mathcal{S}$ using the same algorithm. Therefore, the given graph instance can be partitioned into a graph with nodes that represent $\mathcal{S}$'s.
+
+We can think of $\mathcal{B}$ as the template, and $P(\mathcal{S})$ is the joint distribution of the templates defined in $\mathcal{S}$. The probability $P(\mathcal{S})$ is the \textit{expansion model} of the template that dictates how a template expands to form a graph. We don't have to use a transition model between the templates, because there is no notion of "order" between the places in a topological map. The independence assumption is that any $\mathcal{B}$ in $\mathcal{S}$ is independent from other $\mathcal{B}$'s in the partitioned graph given the other $\mathcal{B}$'s in $\mathcal{S}$.
+
+We can use the random-decomposition method to construct an SPN for $\mathcal{S}$, treating each template as a variable. The inputs of the SPN for $\mathcal{S}$ are sub-SPNs that model template $\mathcal{B}$. This will give us a valid SPN. With this method, the SPN is quite small, and we can do inference at most at the scale of S. It is definitely ok to construct an SPN for a full global map by reusing weights -- We recursively partition the full global map by B and S in alternating fashion, and the weights for the SPN representing B and S are all shared.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Experiments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Experiments}
-\subsection{Data Collection}
-\subsection{Methodology}
-\subsubsection{Experiments for Grid-Based Approach}
-\subsubsection{Experiments for Template-Based Approach}
-\subsection{Results}
+\section{Experiments}\label{section:experiment}
+\subsection{Data Collection}\label{section:data}
+
+In support of the larger goal of our research to learn the Deep Affordance Spatial Hierarchy (DASH), we collected a large dataset of fully-annotated sensory (RGB, laser rangefinder readings, odometry), localization, and virtual scans, a low-level representation of the environment immediate to the robot. For this thesis, we utilized this dataset to generate topological maps with nodes labeled by place categories.
+
+The dataset consists of sequences
+
+\subsection{Methodology}\label{section:method}
+\subsubsection{Experiments for Grid-Based Approach}\label{section:exp-grid}
+\subsubsection{Experiments for Template-Based Approach}\label{section:exp-tmpl}
+\subsection{Results}\label{section:results}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion & Future work
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Conclusion \& Future Work}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% References
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section{References}
-\nocite{*}
-\bibliographystyle{abbrv}
-\bibliography{mythesis}
+\section{Conclusion \& Future Work}\label{section:conclusion}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgement
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newpage
-\section{Acknowledgements}
+\section{Acknowledgements}\label{section:acknowledgement}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newpage
+\nocite{*}
+\bibliographystyle{abbrv}
+\bibliography{mythesis}
+
 
 \newpage
 \appendix
 
 \end{document}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
