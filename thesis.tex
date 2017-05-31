@@ -501,6 +501,15 @@ We used LibSPN \cite{pronobis2016learning}, a Python library that implements lea
 
 \paragraph{Setup} We converted topological maps from Stockholm sequences into place grids. We used place grids of size of 15 rows by 10 columns with resolution of 1.5m per cell. The resolution is lower than the 0.8m of desired place separation in topological map to ensure the connectivity of places when mapped to the grid, as suggested in section \ref{sc:avoidgaps}. Since the size of our dataset is not very large, we lowered the number of place categories to four: doorway, corridor, small office, and large office. so that we can better assess the learning of structure and dependency.
 
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.7]{images/partition_loss.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+
 To verify the consistency of the place grid method,  we used cross-validation by training the network on three floors and test it on the other one, for each combination of the four floors in the Stockholm dataset.
 
 We did not implement the rotation-invariant SPN when testing the place grid method, as the canonical maps in the Stockholm dataset have the same orientation, and the topological map data examples are aligned well with each other. In the future, we plan to let the SPN learn the topological maps from two datasets (e.g. Stockholm and Freiburg) and test it on another (e.g. Saarbrucken), and implement the rotation-invariant SPN.
@@ -516,6 +525,45 @@ During testing, we partition the given topological map test instance by our temp
 Besides, since we are ignoring several place categories such as kitchen and meeting room, there is a significant amount of nodes that would be all labeled unknown (the default label). Therefore, we test both cases of ignoring and not ignoring the unknown class during construction of topological maps examples.
 
 \subsection{Results}\label{section:results}
+
+\subsubsection{Place Grid Method}
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.7]{images/likelihood.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.7]{images/placegrid_completion.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.7]{images/placegri_graph_illustration.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.7]{images/novelty.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:topomap}
+\end{figure}
+
+
+\paragraph{Map completion} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion & Future work
