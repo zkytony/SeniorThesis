@@ -1,4 +1,4 @@
-\documentclass[10pt, titlepage]{article}
+\documentclass[11pt, titlepage]{article}
 \usepackage{amsmath,amsthm,amssymb, listings, tikz, pgf, mathtools}
 \usepackage[top=1.25in, bottom=1.25in, left=1.25in, right=1.25in]{geometry}
 \usepackage{pgf}
@@ -82,7 +82,7 @@
 \newpage
 \pagenumbering{Roman} % Start roman numbering
 \begin{center}\Large \textbf{Abstract}\normalsize\end{center}
-
+An autonomous robot needs the ability to understand the environment, that is, to gather and maintain spatial knowledge. Topological map is commonly used for representing large scale, global maps. Although much work has been done in topological map extraction, very few work touches on the problem of learning it probabilistically. In this thesis, we consider the problem of using probabilistic deep learning model to learn the topological map, which is essentially a sparse undirected graph. We have chosen the sum-product networks (SPN) \cite{poon2011sum} as our model. We propose first two methods to use SPN to learn from a dataset of topologicals. We evaluate the two methods by experiments and our results show their capability of enabling robots to do inference of environment attributes with promising output, showing the understanding of the spatial relations between places. 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % List of Figures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -107,20 +107,24 @@
 \newpage
 \pagenumbering{arabic} % Switch to normal numbers
 \section{Introduction}
-The fundamental motivation of robotics is two-fold. First, robots can take risks in the place of humans, do what humans cannot or struggle to do. Second, robots can assist humans to achieve their goals more efficiently and effectively. The continuing favor of machines in the last several decades saw an explosion of interest and investment in robotics both in commercial applications and academic research \cite{pagliarini2017future}. With little doubt, one of the directions of continuously heavy research is autonomous robots. In this paper, we consider a subfield of autonomous robots, which is that of mobile robots in indoor environments. Mobile robots are desirable to fulfill both aspects of the motivation, especially the second; They have the potential to provide various kinds of services, and recently attempts have been made to apply mobile robots to real-world problems such as helping older people \cite{jayawardena2010deployment}, guiding passengers in airports \cite{triebel2016spencer}, and telepresence \cite{matsuda2016scalablebody}. However, these robots are still far from fully autonomous, and only perform limited actions with specially designed tasks.
+The fundamental motivation of robotics is two-fold. First, robots can take risks in the place of humans, do what humans cannot or struggle to do. Second, robots can assist humans to achieve their goals more efficiently and effectively. The continuing favor of machines in the last several decades saw an explosion of interest and investment in robotics both in commercial applications and academic research \cite{pagliarini2017future}. With little doubt, one of the directions of continuously heavy research is autonomous robots. in this thesis, we consider a subfield of autonomous robots, which is that of mobile robots in indoor environments. Mobile robots are desirable to fulfill both aspects of the motivation, especially the second; They have the potential to provide various kinds of services, and recently attempts have been made to apply mobile robots to real-world problems such as helping older people \cite{jayawardena2010deployment}, guiding passengers in airports \cite{triebel2016spencer}, and telepresence \cite{matsuda2016scalablebody}. However, these robots are still far from fully autonomous, and only perform limited actions with specially designed tasks.
 
-To enable autonomous mobile robots to exhibit complex behaviors in indoor environments, it is crucial for them to form an understanding of the environment, that is, to gather and maintain spatial knowledge. The framework that organizes this understanding is called the spatial knowledge representation. Additionally, it is also crucial for the robots to be able to learn about the spatial knowledge representation in a probabilistic manner. In this paper, we use the Deep Affordance Spatial Hierarchy (DASH) \cite{pronobis2017deep}, a recently proposed hierarchical spatial representation that spans from low-level sensory input layer to high-level human semantics layer.  The ultimate goal of our research is to use a unified deep generative model to capture all layers of DASH, an approach fundamentally different from the traditional where an assembly of independent spatial models exchange information in a limited way \cite{pronobis2016learning}. 
-Specifically, in this paper, we devote our time on learning the layer of topological map, a mainstream graphical representation of the information of places and their connectivity for a full floor map \cite{remolina2004towards}.  We have chosen to use sum-product networks (SPN) \cite{poon2011sum}, a new class of deep probabilistic models. It is favorable for our purpose primarily because of three reasons. First, it is a deep generative model, therefore probabilistic by nature. Second, it allows tractable training and inference time with respect to the size of the network. Third, it is simple to combine multiple SPNs into one, unified SPN with interpretable layers, which matches our purpose nicely.
+To enable autonomous mobile robots to exhibit complex behaviors in indoor environments, it is crucial for them to form an understanding of the environment, that is, to gather and maintain spatial knowledge. The framework that organizes this understanding is called the spatial knowledge representation. Additionally, it is also crucial for the robots to be able to learn about the spatial knowledge representation in a probabilistic manner. in this thesis, we use the Deep Affordance Spatial Hierarchy (DASH) \cite{pronobis2017deep}, a recently proposed hierarchical spatial representation that spans from low-level sensory input layer to high-level human semantics layer.  The ultimate goal of our research is to use a unified deep generative model to capture all layers of DASH, an approach fundamentally different from the traditional where an assembly of independent spatial models exchange information in a limited way \cite{pronobis2016learning}. 
+Specifically, in this thesis, we devote our time on learning the layer of topological map, a mainstream graphical representation of the information of places and their connectivity for a full floor map \cite{remolina2004towards}.  We have chosen to use sum-product networks (SPN) \cite{poon2011sum}, a new class of deep probabilistic models. It is favorable for our purpose primarily because of three reasons. First, it is a deep generative model, therefore probabilistic by nature. Second, it allows tractable training and inference time with respect to the size of the network. Third, it is simple to combine multiple SPNs into one, unified SPN with interpretable layers, which matches our purpose nicely.
 
 Learning a topological map means learning the structure of the large-scale space and dependency between places, for example, how the evidence of a group of places influence the attributes of other places. This is an important step towards planning complex actions in the environment. By itself, it is also useful for tasks such as inferring missing information of a place based on the surrounding places. In the context of DASH, it is can be used for correcting the classification results of the local environment model\footnote{In DASH, above the layer of low-level sensory input, there is a layer called ``peripersonal layer'' which converts sensory input into robot-centric representation of the immediate surroundings, i.e. local environment. More details about DASH is given in section \ref{section:dash}.}. Although there has been considerable effort in the extraction of topological maps \cite{ranganathan2011online}\cite{shi2010online}\cite{tomatis2003hybrid}, only a few work is done to actually learn it with semantic information in the past two decades \cite{aydemir2012can}\cite{mozos2006supervised}, and we have not found any work on learning topological maps probabilisticly to allow inference.
 
 %\subsection{Challenges}
 
-There are three main challenges in this work. First, the topological maps have varying sizes (number of places and connections), and they may be rotated arbitrarily, because the underlying environment may have different dimensions, and there is essentially no loss of dependency information if a topological map is rotated as a whole. Second, there is no existing method that uses SPN to model\footnote{In this paper, ``modeling'' a topological map means the same as ``learning'' it.} the topological map, essentially a sparse, undirected graph. Third, there is not much available data with annotated floor plans and raw robot sensory readings with which we can create a dataset of topological maps. 
+There are three main challenges in this work. First, the topological maps have varying sizes (number of places and connections), and they may be rotated arbitrarily, because the underlying environment may have different dimensions, and there is essentially no loss of dependency information if a topological map is rotated as a whole. Second, there is no existing method that uses SPN to model\footnote{in this thesis, ``modeling'' a topological map means the same as ``learning'' it.} the topological map, essentially a sparse, undirected graph. Third, there is not much available data with annotated floor plans and raw robot sensory readings with which we can create a dataset of topological maps. 
 
 %\subsection{Contributions}
 
-We address the above challenges through our contributions. We present two methods to use SPN to model a topological map: the place grid method, and the template-based method. Both methods aim to deal with the variability of topological maps but with different emphasis on the dependency between places. In the place grid method, we project the topological map onto a grid of fixed size, and generate a SPN structure using random decomposition of the grid. In the template-based method, we train an SPN on a template, or a hierarchy of templates. Each template is a basic graph structure that is assumed to prevail in the topological map. For each topological map instance, we construct an instance-specific full SPN using the template SPNs as children, and do inference on the full SPN. To our knowledge, these are the first methods to use SPN to model a sparse graph. We evaluate the two methods by experiments and our results show their capability of enabling robots to do inference of environment attributes with promising output, showing the understanding of the spatial relations between places. In addition, we created a large dataset with fully annotated localization, sensory information and virtual scans, a low-level geometry representation of robot-centric environment\footnote{We plan to publish this dataset to IJRR soon.}. This dataset is used to evaluate our methods.
+We address the above challenges through our contributions. We present two methods to use SPN to model a topological map: the place grid method, and the template-based method. Both methods aim to deal with the variability of topological maps but with different emphasis on the dependency between places. In the place grid method, we project the topological map onto a grid of fixed size, and generate a SPN structure using random decomposition of the grid. In the template-based method, we train an SPN on a template, or a hierarchy of templates. Each template is a basic graph structure that is assumed to prevail in the topological map. For each topological map instance, we construct an instance-specific full SPN using the template SPNs as children, and do inference on the full SPN. To our knowledge, these are the first methods to use SPN to model a graph. We evaluate the two methods by experiments and our results show their capability of enabling robots to do inference of environment attributes with promising output, showing the understanding of the spatial relations between places. In addition, we created a large dataset with fully annotated localization, sensory information and virtual scans, a low-level geometry representation of robot-centric environment\footnote{We plan to publish this dataset to IJRR soon.}. This dataset is used to evaluate our methods.
+
+\subsection{Constraints}
+In this thesis, we focus on place category as the only semantic attribute for a place. Our rationale is the following. In terms of the learned model's potential usage, it would certainly help if other information such as types of objects in a place, or the low-level sensory information, is provided. However, because our goal is to learn the topological relations between places as good as possible, the added information adds more noise and disturbs our analysis of the model's effectiveness to meet our goal.
+
 
 \subsection{Thesis outline}
 
@@ -153,14 +157,14 @@ Sum-product networks (SPNs), proposed by Poon and Domingos \cite{poon2011sum} ar
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Background
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+%\newpage
 \section{Background}\label{section:background}
 
 \subsection{Sum-Product Networks}\label{section:spn}
 
 \subsubsection{Definitions and Properties}
 
-SPN, proposed by Poon and Domingos \cite{poon2011sum}, is a new class of probabilistic graphical models with built-in properties that allow \textit{tractable} inference, a major advantage over traditional graphical models such as Bayesian networks. The idea is built upon Darwiche's work on network polynomial and differentials in arithmetic circuit representation of the polynomial \cite{darwiche2003differential}. Here, I provide the definition of SPN and several of its key properties.
+SPN, proposed by Poon and Domingos \cite{poon2011sum}, is a new class of probabilistic graphical models with built-in properties that allow \textit{tractable} inference, a major advantage over traditional graphical models such as Bayesian networks. The idea is built upon Darwiche's work on network polynomial and differentials in arithmetic circuit representation of the polynomial \cite{darwiche2003differential}. Here, we provide the definition of SPN and several of its key properties.
 
 \begin{definition}[SPN]
 \cite{poon2011sum}
@@ -275,24 +279,24 @@ We use a different approach in learning the SPN structure, similar to the one us
 
 \subsection{Deep Affordance Spatial Hierarchy}\label{section:dash}
 
-Pronobis et.~al.~\cite{pronobis2017deep} proposed a hierarchical spatial representation named Deep Affordance Spatial Hierarchy (DASH). In their work, they also discussed the properties of a desired representationI summarize these properties as follows: 
+Pronobis et.~al.~\cite{pronobis2017deep} proposed a hierarchical spatial representation named Deep Affordance Spatial Hierarchy (DASH). In their work, they also discussed the properties of a desired representation. We summarize these properties as follows: 
 
 \begin{enumerate}[label=(\arabic*)]
     \item Minimal;
-    \item Hierarchical (It allows long-term, high-level, global planning to break down to short-term, lower-level local planning);
-    \item Correlating abstraction with information persistence (more dynamic means less persistent, which requires higher level of abstraction);
+    \item Hierarchical. It allows long-term, high-level, global planning to break down to short-term, lower-level local planning;
+    \item Correlating abstraction with information persistence. In other words, more dynamic means less persistent, which requires higher level of abstraction;
     \item Probabilistic;
-    \item Representing the unknowns;
+    \item Representing the unknowns, that is, it allows the representation of default knowledge;
 \end{enumerate}
 
-\noindent Guided by the above principles, the authors showed DASH, which aims to be used by deep learning frameworks. DASH consists of four layers.
+\noindent Guided by the above principles, the authors presented DASH, which is aimed to be used by deep learning frameworks. DASH consists of four layers.
 \begin{enumerate}[label=(\arabic*)]
     \item Perceptual layer represents the robot's raw sensor readings. In the paper, the authors used occupancy grid to represent the laser-range observations, centered at the robot's position.
-    \item Peripersonal layer represents objects, obstacles, and landmarks in the space immediately surrounding the robot. The authors used a polar occupancy grid representation which is a simplification of this layer's information.
-    \item Topological layer represents the graphical structure of the map that connects places together. It maintains information of the places, including the eight views of a place, and the connectivity between places. It also contains placeholders. In the paper, a topological map is constructed from first sampling places in a window centered at the robot, according to the probability distribution $P(E|G)$, where $E$ is the variable for existance of places, and $G$ is the perceptual\footnote{I think this should be peripersonal, from the polar occupancy grid. But there is little difference between the first two layers due to the simplification in the peripersonal layer.} occupancy grid. Then, according to navigation affordance, places reachable from the robot are added. The affordance is determined by A* search over the potential field $P(E|G)$. 
-    \item Semantic Layer represents human concepts about the places, such as place categories. The knowledge represented in this layer can be used for complex human-robot interaction tasks. In the paper, the authors implemented a probabilistic relational data structure but the details are not shown.
+    \item Peripersonal layer represents objects, obstacles, and landmarks in the space immediately surrounding the robot. The authors used a polar occupancy grid representation which is a simplification of this layer's information. 
+    \item Topological layer represents the graphical structure of the map that connects places together. It maintains information of the places, such as place categories and views at different angles, and the connectivity between places. It also contains placeholders. In the paper, a topological map is constructed from first sampling places in a window centered at the robot, according to the probability distribution $P(E|G)$, where $E$ is the variable for existance of places, and $G$ is the occupancy grid provided by the perceptual layer. Then, according to navigation affordance, places reachable from the robot are added. The affordance is determined by A* search over the potential field $P(E|G)$.  More details on topological map generation is discussed in the next section.
+    \item Semantic Layer represents human concepts about the places. It can be visualized as a concept map that specifies the relations between concepts. The knowledge represented in this layer can be used for complex human-robot interaction tasks. In the paper, the authors implemented a probabilistic relational data structure that mimics a concept map.
 \end{enumerate}
-When the robot is handed with a DASH, ideally it is supposed to be able to navigate around and complete tasks that involve interaction with humans. And the robot should be able to explore the environment and build up the topological layer on its own. However, it does not have the ability to model uncertainty in the environment, and infer semantics of placeholders or other latent variables. To enable this, the authors used DGSM (Deep Generative Spatial Model) \cite{pronobis2016learning} to represent the default knowledge about the environment. Default knowledge can be understood as the knowledge that the system assumes before it is provided explicitly. In the context of the paper, default knowledge means place semantics that the model infers for all places (including placeholders) based on its training data. DGSM is an architecture that essentially connects the four layers together, with sensory readings as input, and semantics as output. 
+When the robot is handed with a DASH, ideally it is supposed to be able to navigate around and complete tasks that involve interaction with humans. And the robot should be able to explore the environment and build up the topological layer on its own. However, on its own, it does not have the ability to model uncertainty in the environment, and infer semantics of placeholders or other latent variables. To enable this, the authors used DGSM (Deep Generative Spatial Model) \cite{pronobis2016learning} to represent the default knowledge about the environment. Default knowledge can be understood as the knowledge that the system assumes before it is provided explicitly. In the context of the paper, default knowledge means place semantics that the model infers for all places (including placeholders) based on its training data. In this thesis, we also focus on using place categories as our semantic information. While DGSM learns a local version of the DASH spatial knowledge, we enable the learning of the topological layer in this thesis. Eventually, we look to connect the two so that the entire spatial knowledge hierarchy is represented.
 
 \subsection{Topological Maps}\label{section:topomap}
 
@@ -305,11 +309,11 @@ A topological map is a graph that captures the overall geometry of the map as we
     \label{fig:topomap}
 \end{figure}
 
-Pronobis et.al. \cite{pronobis2017deep} propose a framework of spatial knowledge representation, called Deep Affordance Spatial Hierarchy (DASH), in which topological map is used as a layer to capture the geometry of the map and connectivity between places. They describe a mapping algorithm that builds a topological map. As the robot explores an environment, the mapping algorithm expands the topological map by adding \textit{placeholders} \cite{pronobis2010representing} as nodes, according to a probability formulation as follows
+As discussed previously, topological map is used as a layer to capture the geometry of the map and connectivity between places in the DASH. The authors of DASH \cite{pronobis2017deep} also describe a mapping algorithm that builds a topological map. As the robot explores an environment, the mapping algorithm expands the topological map by adding \textit{placeholders} \cite{pronobis2010representing} as nodes, according to a probability formulation as follows
 \begin{equation}\label{eq:p_eg}
   P(E|G) = \frac{1}{Z}\prod_i\phi_I(E_i)\phi_N(E_i, \mathcal{E})
 \end{equation}
-where $P(E|G)$ is the probability of placeholder locations $E$ given robot-centered occupancy grid $G$ which represents laser-range observations. The potential function $\phi_I(E_i)$ models the existence of placeholder at location $i$, denoted as $E_i\in\{0,1\}$\footnote{For details about how $\phi_I(E_i)$ is defined, refer to the original paper \cite{pronobis2017deep}.}. The potential function $\phi_N(E_i, \mathcal{E})$ models the probability of placeholder $E_i$ in the neighborhood of the set of existing places $\mathcal{E}$. It is defined as
+where $P(E|G)$ is the probability of placeholder locations $E$ given robot-centered occupancy grid $G$ which represents laser-range observations. The potential function $\phi_I(E_i)$ models the existence of placeholder at location $i$, denoted as $E_i\in\{0,1\}$. For details about how $\phi_I(E_i)$ is defined, refer to the original paper \cite{pronobis2017deep}.. The potential function $\phi_N(E_i, \mathcal{E})$ models the probability of placeholder $E_i$ in the neighborhood of the set of existing places $\mathcal{E}$. It is defined as
 \begin{equation}\label{eq:phi_n}
   \phi_N(E_i, \mathcal{E}) = \sum_{p\in\mathcal{E}}\exp\Big(-\frac{(d(i,p)-d_n)^2}{2\sigma^2}\Big)
 \end{equation}
@@ -318,22 +322,24 @@ where $d(i,p)$ is the distance between location $i$ and place $p$. The key point
 \subsubsection{Challenges}
 There are several challenges in modeling topological maps due to their scale and variability. A full map of a workspace may contain dozens of nodes and hundreds of edges. The number of places in one map likely differs from that in another. Different topological maps may represent environments of different dimensions. The structure of places in one map may appear very differently compared to another. Even for similar environments, the topological maps may be rotated differently, because rotation does not lose information in a topological map. 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Proposed Solutions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %\newpage
 \section{Problem Statement \& Proposed Solutions}\label{section:sol}
 \subsection{Problem Statement}\label{section:problem}
+
+Our problem is the following. Can we train sum-product networks on a dataset of topological maps, such that the resulting model is able to demonstrate its understanding of the spatial relations of categories? It can demonstrate this ability in several ways. For example, if we present a topological map instance with missing semantic information, the model should reasonably predict what the missing information is. In section \ref{section:experiment}, we describe experiments conducted to test out this ability.
+
 \subsection{Place Grid Method}\label{section:grid}
-To address the challenge that topological maps are of different sizes and shapes, we present a simple idea which is to map them to fixed-size grids. A grid can be considered as a generic representation of topological maps. It approximates the topological map, but preserves most of the adjacency relations between places. It is straightforward to use SPN to model this grid, using the algorithm in \ref{sc:rand}, and thus indirectly model topological maps as a whole. 
+To address the challenge that topological maps are of different sizes and shapes, we present a simple idea which is to map them to fixed-size grids. A grid can be considered as a generic representation of topological maps. It approximates the topological map, but preserves most of the adjacency relations between places. It is straightforward to use SPN to model this grid. Using the algorithm in \ref{sc:rand}, we can train an SPN for the grid, which then indirectly models topological maps as a whole. 
 
 \subsubsection{From Topological Map to Place Grid}
 
-In this section, I first define a \textit{place} in a topological map, then define a \textit{place grid}, and then describe in detail how can a topological map be mapped to a place grid. My definition of a place follows from the polar occupancy grid representation for local environment escribed by Pronobis and Rao in \cite{pronobis2016learning}.
+In this section, we first define a \textit{place} in a topological map, then define a \textit{place grid}, and then describe in detail how can a topological map be mapped to a place grid. Our definition of a place follows from the polar occupancy grid representation for local environment described by Pronobis and Rao in \cite{pronobis2016learning}.
 
 \begin{definition}[Place]
-A \textit{place} $p$ in a topological map is a tuple $(L, V)$ where $L$ is the location of $p$ with respect to the topological map's coordinate system, and $V$ is the robot-centric polar occupancy grid that is divided into 8 views. 
+A \textit{place} $p$ in a topological map is a three-tuple $(L, V, a)$ where $L$ is the location of $p$ with respect to the topological map's coordinate system, $V$ is the set of views in the polar occupancy grid, and $a$ is the label for place category.
 \end{definition}
 
 \noindent An example polar occupancy grid of a place is shown in figure \ref{fig:place}.
@@ -364,8 +370,6 @@ To deal with the situation where multiple places map to the same cell, we can do
 \item Create a hybrid place by sampling views from these places with probability according to $\phi_I(E_p)$.
 \end{itemize}
 
-\paragraph{Example} 
-
 \begin{figure}[!htb]
     \centering
     \captionsetup{width=.8\linewidth}
@@ -374,11 +378,11 @@ To deal with the situation where multiple places map to the same cell, we can do
     \label{fig:grid_learn}
 \end{figure}
 
+We conduct experiments to test this place grid method (section \ref{section:experiment}). Because the training and validation topological map instances of our experiment are built from one single building, these instances do not vary much in rotation. In general, however, we need to deal with the case where we have no assumption of from where the topological maps are generated. Next, we provide a solution in theory to deal with topological maps with different rotations, in the context of the place grid method.
+
 \subsubsection{Modeling a Place Grid Using Rotation-Invariant SPN}
 
-We can use the random-decomposition algorithm to construct an SPN that models a place grid, as shown in figure \ref{fig:grid_learn}. One issue with using the place grid is that two topological maps may represent similar spatial information but are rotated with respect to each other, and this leads them to map to drastically different place grids. Therefore, we need some way of dealing with the rotation of topological maps.
-
-There are multiple ways to can resolve this. We could rotate all the topological maps before hand, based on the prior knowledge that human environments typically have right angle corners and straight walls. Another way is to incorporate rotation-invariance into the SPN that models the place grid. Here, we present the construction of a rotation-invariant SPN based on a place grid.
+There are multiple ways to deal with the rotation of topological maps. We could rotate all the topological maps before hand, based on the prior knowledge that human environments typically have right angle corners and straight walls. Another way is to incorporate rotation-invariance into the SPN that models the place grid. Here, we present the theory of constructing a rotation-invariant SPN based on a place grid.
 
 \paragraph{Rotation-invariant SPN} We consider $k$ number of major directions (e.g. 8). At the top level of the SPN, we add a max node with $k$ children of sum nodes where each sum node models the place grid for a certain orientation. Suppose one child $A$ is a grid resulted from rotating another child $B$ by angle $\theta$. Then, a cell $(x_B, y_B)$ in $B$ corresponds with (has the same value as) a cell $(x_A, y_A)$ in $A$ by the following transform:
 
@@ -396,21 +400,21 @@ y_B \\
 
 With the above relation, we are not adding more inputs to the SPN. We simply connect a cell in the grid with the corresponding input for the place. There is a case where this relation causes $(x_B, y_B)$ to be out of bound, which means that there are some cells in the ``rotated'' grid $B$ that have no corresponding cells in $A$. We simply ignore the out of bound cells, and feed 1 as input for those cells that have no correspondence. One way to reduce the effect of this on the trained SPN is by using a place grid with large dimension where there are loops of cells that are supposed to be empty. The point is that these cells do not really affect the SPN's representation of the useful parts in the place grid where mapping happens.
 
-\begin{figure}[!htb]
-    \centering
-    \captionsetup{width=.8\linewidth}
-    \includegraphics[scale=0.6]{images/grid_method.png}
-    \caption{High-level process of the Place Grid Method. We have several place grids with different resolutions, each is modeled by an SPN using the random-decomposition algorithm. The topological maps are mapped to the grids to provide training examples for the SPNs.}
-    \label{fig:topomap}
-\end{figure}
+%% \begin{figure}[!htb]
+%%     \centering
+%%     \captionsetup{width=.8\linewidth}
+%%     \includegraphics[scale=0.6]{images/grid_method.png}
+%%     \caption{High-level process of the Place Grid Method. We have several place grids with different resolutions, each is modeled by an SPN using the random-decomposition algorithm. The topological maps are mapped to the grids to provide training examples for the SPNs.}
+%%     \label{fig:topomap}
+%% \end{figure}
 
-At this point, we can certainly map any topological map to grids of different resolutions, and use an SPN to model each. Lower resolution means the grid represents relations of places at a more general level. This effectively results in an ensemble of SPNs (see figure \ref{fig:topomap})). If a query concerns, for example, what category should a place at a location in the topological map be given its surroundings, we can have the ensemble of SPNs to each come up with an answer and combine them in a certain way (e.g. weighted voting) to produce the final answer. 
+%% At this point, we can certainly map any topological map to grids of different resolutions, and use an SPN to model each. Lower resolution means the grid represents relations of places at a more general level. This effectively results in an ensemble of SPNs (see figure \ref{fig:topomap})). If a query concerns, for example, what category should a place at a location in the topological map be given its surroundings, we can have the ensemble of SPNs to each come up with an answer and combine them in a certain way (e.g. weighted voting) to produce the final answer. 
 
 \subsection{Template-Based Method}\label{section:tmpl}
 
-One shortcoming of the place grid method is its rely on rotation-invariant SPNs. Besides, the grid itself is in the middleground between being accurate and approximate: Althougth the grid is metric, the cells do not accurately represent the location of places. This may affect the quality of inference.
+One shortcoming of the place grid method is its rely on a predefined size and resolution of the grid; choosing the right dimensions and resolution is a difficult task and usually the chosen parameters does not generalize well for other unseen topological map instances. Besides, the grid itself is in the middleground between being accurate and approximate: Althougth the grid is metric, the cells do not accurately represent the location of places. This may affect the quality of inference.
 
-To some extent, it is unnecessary to have an accurate absolute representation of the topological map, because (1) it is hard to maintain this accuracy given the variability of topological maps, and (2) topological maps are usually used in conjunction with metric grid maps for robot planning and navigation, serving as a reference for high-level planning. Therefore, we propose a template-based relative representation of the topological map, which models some certain basic structure of a graph, and expands as needed.
+To some extent, it is unnecessary to have an accurate absolute representation of the topological map, because (1) it is hard to maintain this accuracy given the variability of topological maps, and (2) topological maps are usually used in conjunction with metric grid maps for robot planning and navigation, serving as a reference for high-level planning. Therefore, we propose a template-based relative representation of the topological map, which models some certain basic structure of a graph, and expands as needed. As discussed before, the findings by  Aydemir et.~al.~\cite{aydemir2012can} support the idea of using a subgraph of small size as the template for the entire topological map.
 
 \begin{figure}[!htb]
     \centering
@@ -420,7 +424,7 @@ To some extent, it is unnecessary to have an accurate absolute representation of
     \label{fig:tmpmod}
 \end{figure}
 
-Consider a \textit{basic structure} $\mathcal{B}$, such as the three-node structure in figure \ref{fig:tmpmod}. The only constraint that this structure has is the connectivity of the nodes; How the views are connected is not constrained. Therefore, this basic structure is rotation-insensitive. We can partition a given graph instance using $\mathcal{B}$. Note that $\mathcal{B}$ should be a very simple structure. One reason is that a simple structure likely occurs very often in the topological map. Another reason is that finding if a graph is a subgraph of another (subgraph isomorphism problem) is NP-complete. Linear time solution exists but only works for planar graphs \cite{eppstein1995subgraph}, and a topological map is not necessarily planar. Examples of such basic structure are shown in figure \ref{fig:basic_struct}. Algorithm \ref{alg:part_graph} is a greedy algorithm to partition the graph when $B$ is very simple. In this algorithm, \textbf{match\_graph} is assumed to be a function that is specific to $\mathcal{B}$; it could be hard-coded. The output of this algorithm is a graph $H$ where nodes are the basic structures and edges indicate their connectivity (see the green groups in figure \ref{fig:basic_struct}).
+Consider a \textit{basic structure} $\mathcal{B}$, such as the three-node structure in figure \ref{fig:tmpmod}. The only constraint that this structure has is the connectivity of the places; How the views are connected is not constrained. Therefore, this basic structure is rotation-insensitive. We can partition a given graph instance using $\mathcal{B}$. Note that $\mathcal{B}$ should be a very simple structure. One reason is that a simple structure likely occurs very often in the topological map. Another reason is that finding if a graph is a subgraph of another (subgraph isomorphism problem) is NP-complete. Linear time solution exists but only works for planar graphs \cite{eppstein1995subgraph}, and a topological map is not necessarily planar. Examples of such basic structure are shown in figure \ref{fig:basic_struct}. Algorithm \ref{alg:part_graph} is a greedy algorithm to partition the graph when $B$ is very simple. In this algorithm, \textbf{match\_graph} is assumed to be a function that is specific to $\mathcal{B}$; it could be hard-coded. The output of this algorithm is a graph $H$ where nodes are the basic structures and edges indicate their connectivity (see the green groups in figure \ref{fig:basic_struct}). It is likely that the output of this algorithm is a graph that does not cover all nodes from the input graph. Yet, as shown in figure \ref{fig:part_drop}, the number of uncovered nodes drops rapidly as we increase the number of partition attempts, that is, the number of times we run this algorithm. With this, we know that we can cover the topological relations in the graph better if we partition the graph multiple times, both in training and testing.
 
 \begin{figure}[!htb]
     \centering
@@ -457,16 +461,27 @@ Consider a \textit{basic structure} $\mathcal{B}$, such as the three-node struct
     \KwRet{$(V_H, E_H)$}
 \end{algorithm}
 
-Now, consider another simple graph structure $\mathcal{S}$ that consists of $\mathcal{B}$. For example, $\mathcal{S}$ is a pair of $\mathcal{B}$ connected as shown in the red region of the topological map in figure \ref{fig:basic_struct}. We can again partition the graph $H$ by $\mathcal{S}$ using the same algorithm. Therefore, the given graph instance can be partitioned into a graph with nodes that represent $\mathcal{S}$'s.
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.5]{images/partition_loss.png}
+    \caption{The relation between number of partition attempts and the number of nodes uncovered by any of these attempts.}
+    \label{fig:part_drop}
+\end{figure}
 
-We can think of $\mathcal{B}$ as the template, and $P(\mathcal{S})$ is the joint distribution of the templates defined in $\mathcal{S}$. The probability $P(\mathcal{S})$ is the \textit{expansion model} of the template that dictates how a template expands to form a graph. We don't have to use a transition model between the templates, because there is no notion of "order" between the places in a topological map. The independence assumption is that any $\mathcal{B}$ in $\mathcal{S}$ is independent from other $\mathcal{B}$'s in the partitioned graph given the other $\mathcal{B}$'s in $\mathcal{S}$.
 
-We can use the random-decomposition method to construct an SPN for $\mathcal{S}$, treating each template as a variable. The inputs of the SPN for $\mathcal{S}$ are sub-SPNs that model template $\mathcal{B}$. This will give us a valid SPN. With this method, the SPN is quite small, and we can do inference at most at the scale of S. It is definitely ok to construct an SPN for a full global map by reusing weights -- We recursively partition the full global map by B and S in alternating fashion, and the weights for the SPN representing B and S are all shared.
+
+Now that we have a basic structure as our template, we can consider constructing a \textit{hierarchy} of the templates. Consider another simple graph structure $\mathcal{S}$ that consists of $\mathcal{B}$. For example, $\mathcal{S}$ is a pair of $\mathcal{B}$ connected as shown in the red region of the topological map in figure \ref{fig:basic_struct}. We can again partition the graph $H$ by $\mathcal{S}$ using the same algorithm. Therefore, the given graph instance can be partitioned into a graph with nodes that represent $\mathcal{S}$'s.
+
+We can think of $\mathcal{B}$ as the template, and $P(\mathcal{S})$ is the joint distribution of the templates defined in $\mathcal{S}$. The probability $P(\mathcal{S})$ is the \textit{expansion model} of the template that dictates how a template expands to form a graph. Unlike other template-based models such as hidden Markov Models (HMMs), we don't have to use a transition model between the templates, because there is no notion of "order" between the places in a topological map.
+
+We can construct an SPN for the hierarchy of templates using the random-decomposition method. The resulting SPN is likely small. We can perform inference at the scale of the entire topology map by constructing an instance-specific SPN: For a given test case, we partition the topological map using the same structures $\mathcal{B}$ and $\mathcal{S}$. We do this partition multiple times to capture as much combination of nodes that form the template structures as possible. For each template we construct a subSPN that has the exact same structure and weights as the learned template SPN. We combine these subSPNs together simply by a product node. For those nodes that were not covered in each partitioning, we construct an SPN structure but with random weights. This makes sure that the resulting full SPN is a mixture of two SPNs that model two different partitioning of the graph, and thus guarantee the validity. The method of combining templates and dealing with the uncovered nods is one direction of future work.
+% We recursively partition the full global map by B and S in alternating fashion, and the weights for the SPN representing B and S are all shared.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Experiments
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+%\newpage
 \section{Experiments}\label{section:experiment}
 \subsection{Data Collection}\label{section:data}
 
@@ -484,9 +499,9 @@ The dataset consists of 100 sequences and total of 11 different floor plans in t
  \hline
  \# floor plans & 4 & 3 & 4 \\
  \hline
- Avg. \# topological map nodes per sequence & 103.62 & 66.12 & -\footnote{We did not generate topological maps for the Saarbrucken sequences.} \\
+ Avg. \# topological map nodes per sequence & 103.62 & 66.12 & --\footnote{We did not generate topological maps for the Saarbrucken sequences.} \\
  \hline
- Avg. \# topological map edges per sequence & 159.90 & 104.86 & - \\
+ Avg. \# topological map edges per sequence & 159.90 & 104.86 & -- \\
  \hline
  \end{tabular}
  \caption{Details of the dataset}
@@ -501,16 +516,8 @@ We used LibSPN \cite{pronobis2016learning}, a Python library that implements lea
 
 \paragraph{Setup} We converted topological maps from Stockholm sequences into place grids. We used place grids of size of 15 rows by 10 columns with resolution of 1.5m per cell. The resolution is lower than the 0.8m of desired place separation in topological map to ensure the connectivity of places when mapped to the grid, as suggested in section \ref{sc:avoidgaps}. Since the size of our dataset is not very large, we lowered the number of place categories to four: doorway, corridor, small office, and large office. so that we can better assess the learning of structure and dependency.
 
-\begin{figure}[!htb]
-    \centering
-    \captionsetup{width=.8\linewidth}
-    \includegraphics[scale=0.7]{images/partition_loss.png}
-    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
-    \label{fig:topomap}
-\end{figure}
 
-
-To verify the consistency of the place grid method,  we used cross-validation by training the network on three floors and test it on the other one, for each combination of the four floors in the Stockholm dataset.
+To verify the consistency of the place grid method,  we used cross-validation by training the network on three floors and test it on the other one, for each combination of the four floors in the Stockholm dataset. The training procedure's likelihood curve is shown in \ref{fig:likelihood}. As we can see, the standard deviation of the likelihood values is small, which suggests that training on either three of the four floors results in a very similar model.
 
 We did not implement the rotation-invariant SPN when testing the place grid method, as the canonical maps in the Stockholm dataset have the same orientation, and the topological map data examples are aligned well with each other. In the future, we plan to let the SPN learn the topological maps from two datasets (e.g. Stockholm and Freiburg) and test it on another (e.g. Saarbrucken), and implement the rotation-invariant SPN.
 
@@ -520,7 +527,7 @@ We did not implement the rotation-invariant SPN when testing the place grid meth
 
 \paragraph{Setup} As described in section \ref{section:tmpl}, during training, we train an SPN for a single template, or a hierarchy of templates. Therefore, we created a dataset where each example is an assignment of the template variables. We do this by partitioning the available topological maps using the templates. The partition operation is done 10 times for each topological map, to capture different combinations of nodes.
 
-During testing, we partition the given topological map test instance by our templates, and construct a full SPN for this instance. We let the weights of the sub-SPNs that model templates shared.  To ensure that different combinations of nodes are captured, the full SPN is constructed over two different partitions of the test graph. The full SPN is created by using a product node over all the templates, as doing so unions the scope of the variables (i.e. nodes). To ensure completeness of the full SPN, the sub-SPN for each partition needs to cover all the nodes in the topological map. Since there are nodes that are covered by during each partition operation, we initialize another SPN with dense structure which simply takes all unused nodes as inputs with zero weights. As shown in figure \ref{fig:drop}, the number of uncovered nodes drops quickly as the number of partitions is attempted for a graph instance.
+During testing, we partition the given topological map test instance by our templates, and construct a full SPN for this instance. We let the weights of the sub-SPNs that model templates shared.  To ensure that different combinations of nodes are captured, the full SPN is constructed over two different partitions of the test graph. The full SPN is created by using a product node over all the templates, as doing so unions the scope of the variables (i.e. nodes). To ensure completeness of the full SPN, the sub-SPN for each partition needs to cover all the nodes in the topological map. Since there are nodes that are covered by during each partition operation, we initialize another SPN with dense structure which simply takes all unused nodes as inputs with zero weights. As shown in figure \ref{fig:part_drop}, the number of uncovered nodes drops quickly as the number of partitions is attempted for a graph instance.
 
 Besides, since we are ignoring several place categories such as kitchen and meeting room, there is a significant amount of nodes that would be all labeled unknown (the default label). Therefore, we test both cases of ignoring and not ignoring the unknown class during construction of topological maps examples.
 
@@ -530,9 +537,9 @@ Besides, since we are ignoring several place categories such as kitchen and meet
 
 \begin{figure}[!htb]
     \centering
-    \captionsetup{width=.8\linewidth}
-    \includegraphics[scale=0.7]{images/likelihood.png}
-    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \captionsetup{width=.6\linewidth}
+    \includegraphics[scale=0.3]{images/likelihood.png}
+    \caption{Average likelihood curve when training an SPN that models the placegrid of size 15 by 10. }
     \label{fig:topomap}
 \end{figure}
 
@@ -540,47 +547,64 @@ Besides, since we are ignoring several place categories such as kitchen and meet
 \begin{figure}[!htb]
     \centering
     \captionsetup{width=.8\linewidth}
-    \includegraphics[scale=0.7]{images/placegrid_completion.png}
-    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
-    \label{fig:topomap}
+    \includegraphics[scale=0.8]{images/placegrid_completion.png}
+    \caption{Some results of map completion. On the left side of the division line are results from training samples, and on the other side are results from validation samples (i.e. on floors that the model were not trained on). The dark blue region or dots indicate places that are occluded. Color mapping: light blue = unknown, light green = corridor, cyan = doorway, yellow = small office, orange = large office.}
+    \label{fig:basic_compl}
 \end{figure}
 
 \begin{figure}[!htb]
     \centering
     \captionsetup{width=.8\linewidth}
     \includegraphics[scale=0.7]{images/placegri_graph_illustration.png}
-    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
-    \label{fig:topomap}
+    \caption{Showcase of the topological map gets updated as inference is done on the place grid. The top row shows query place grids (with dark blue as latent variables.), and the bottom row shows inference results produced by the network. In the topological map images, gray nodes have missing values. Color map in the topological map: red = corridor, cyan = doorway, blue = small office, green = large office.}
+    \label{fig:pg_graph}
 \end{figure}
 
 
 \begin{figure}[!htb]
     \centering
     \captionsetup{width=.8\linewidth}
-    \includegraphics[scale=0.7]{images/novelty.png}
-    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
-    \label{fig:topomap}
+    \includegraphics[scale=0.4]{images/novelty.png}
+    \caption{Novel structure detection results. On the x-axis, each label indicates the rooms that are swapped. For example, ``DW-CR'' means we swapped doorway and corridor classes. 1PO means small office. 2PO means large office.}
+    \label{fig:novelty}
 \end{figure}
 
 
-\paragraph{Map completion} 
+\paragraph{Map completion} We tested our trained model's ability to infer missing information in the topological map. For each topological map test case, we occlude different parts of its projected place grid, and use the model to perform MPE inference to get an assignment for the missing values. The results are shown in figure \ref{fig:basic_compl}. The results, especially the one of random occlusion of cells on the region of the place grid corresponding to the topological, indicate that the model learns the relations between place categories to some degree. We also demonstrate the actual use of the place grid method to fill in the spatial knowledge gaps in the topological graph in figure \ref{fig:pg_graph}.
 
+\paragraph{Novel structure detection} One other way of checking the model's understanding of the environment is to see if it acts differently when two room classes switch their residing cells. Our results in figure \ref{fig:novelty}, indeed, there is a low likelihood of unlikely swapping of places. Also, the likelihood after switching the two office classes (small and large) is lower than likelihoods of other combinations of swap. This shows that the model does learn the role each room category plays differently.
+
+\subsubsection{Template-Based Method}
+
+We conducted the missing value completion experiment on three sequences\footnote{The amount tested is limited by time, mostly due to the expensive weight-sharing implementation currently.}. Figure \ref{fig:tmpl_result} shows the result of one of the sequences, where we skipped the places with unknown category, and we used a hierarchy of templates. We found that typically a template hierarchy leads to better results than using only a single template, but there are times when neither of them work quite as reasonable. The unreasonable behaviors are mostly reflected in, for example, inferring a place to have class ``small office'' when its surroundings are mostly ``large office''. The figure below also demonstrates this issue. This method is, however, able to infer that there is a doorway structure between two places of different classes. It also seems to be able to infer the place class according to the surrounding information, because otherwise, there would not be a group of places predicted as doorway while another group of places predicted as small office.
+
+\begin{figure}[!htb]
+    \centering
+    \captionsetup{width=.8\linewidth}
+    \includegraphics[scale=0.8]{images/topo_result.png}
+    \caption{Simplified example topological maps. The text on a node indicates the category of the place (Ba = bathroom, Cr = corridor, Dw = doorway, Of = office).}
+    \label{fig:tmpl_result}
+\end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Conclusion & Future work
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
 \section{Conclusion \& Future Work}\label{section:conclusion}
+
+In this thesis, we motivated the importance of learning a spatial representation for autonomous mobile robotics. We described the role of topological map and discussed its generation in the context of Deep Affordance Spatial Hierarchy. Then, we presented two methods that can enable learning of topological map using sum-product networks. Finally, we described experiments and presented results that demonstrate the effect of the learning for each method.
+
+Indeed, there is work to be done to improve each of the two methods. Especially for template-based method, the current handling of uncovered nodes leads to unpredictable behavior of the network. We are looking to aeddress this problem, and arrive at a more robust method of modeling topological maps.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Acknowledgement
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
 \section{Acknowledgements}\label{section:acknowledgement}
+
+I am sincerely grateful for the advice and encouragement from my advisor Dr.~Andrzej Pronobis, and insightful discussions I had we him as well as with my lab partner Kousuke Ariga. I also thank Yu Xiang, who shared plenty of his valuable experience in doing reserach projects. I thank the Robotics State-Estimation Lab run by Prof.~Dieter Fox for providing the space for me to do this work, and I enjoyed the atmosphere as well as the kind labmates there.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % References
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
 \nocite{*}
 \bibliographystyle{abbrv}
 \bibliography{mythesis}
