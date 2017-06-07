@@ -1,0 +1,173 @@
+Conceptual Spatial Representations for Indoor Mobile Robots (2008):
+- Earlier work -
+
+They built a conceptual map to integrate environment with ontology knowledge. The environment knowledge
+is typically asserted by human and not discovered by the robot. The robot may be able to infer the
+type of room by object recognition, but there is no understanding of relations between rooms and how
+that affects the robot's inference.
+
+
+Egocentric Qualitative Spatial Knowledge Representation for Physical Robots (2004):
+- Earlier work -
+
+Modeling complex behavior imposes strong requirements on the underlying representations. The representation should 
+provide several levels of abstraction for activities as well as for objects.
+
+They chose egocentric representation, which is a relative representation of the objects around the robot,
+based on the heuristic that it provides better support for acting directly in physically grounded environments,
+since perception as well as the use of actuators are directly based on egocentric representation. Their reasons
+are not very strong and they only use "literature" to support it.  (The authors point out that in many fields,
+describing something typically involve both egocentric and allocentric terms.) Predefined landmark relations.
+
+(It's interesting that they never seem to point out any weakness in their own work. Everything they say is either
+positive or twisting-to-positive)
+
+
+Factoring the mapping problem: Mobile robot map-building in the Hybrid Spatial Semantic Hierarchy (2008):
+- Earlier work -
+
+(Basically builds on The Spatial Semantic Hierarchy in 1999, by Benjamin Kuipers
+   In this paper, the author introduced the importance of having a spatial knowledge:
+
+   Spatial knowledge is foundational to commonsense knowledge, and hence to most
+   kinds of knowledge that humans possess. Spatial metaphors are ubiquitous in discourse,
+   and draw on preexisting spatial knowledge to communicate relationships and processes
+   that would be difficult to communicate otherwise [59]. Spatial knowledge is grounded in
+   sensorimotor experience: that is, the meanings of symbols in a symbolic representation
+   of space are constrained by experience of perception and action [33]. Spatial knowledge
+   takes a number of quite different forms, including procedures for getting from one place
+   to another, topological network maps of an environment, and geometrical models of the
+   environment [67]. Children exhibit qualitatively different types of behavior as they grow
+   and develop, acquiring the ability to construct and use different forms of spatial knowledge
+   [79,89].
+
+   There are several different types of spatial knowledge, distinguished by the nature of
+   the interaction between the agent and the environment. This paper focuses primarily on
+   large-scale space, which is defined as space whose structure is at a much larger scale than
+   the sensory horizon of the agent. Thus, to learn a map, the agent must travel through the
+   space, gathering local observations and inferring their global relationships from the actions
+   linking them. Memory and processing limitations are also important to the representation
+   of large-scale space, since the time required for travel is long enough for other pressing
+   concerns to interrupt the processing of spatial knowledge. Human knowledge of large-scale
+   space is sometimes called the cognitive map, though it is in many ways not map-like [48].
+   Other closely related but distinct types of spatial knowledge include visual space, which
+   describes the immediately surrounding environment and is explored quickly by moving
+   the gaze [97], and graphical space, a special case of visual space where the structure is the
+   spatial layout and relations among symbols on paper or other display [30].
+   This paper focuses on large-scale space because the different types of knowledge and
+   the learning processes are particularly accessible, being spread out in space and time, both
+   exploration time and developmental time. We also focus on the problems of exploring
+   the environment and learning its spatial structure, rather than on problem-solving, on the
+   grounds that many effective algorithms exist for way-finding based on various spatial
+   representations [20,35].
+)
+
+Our approach factors the mapping problem into natural sub-goals: building a metrical representation
+for local small-scale spaces; finding a topological map that represents the qualitative structure of large-
+scale space. (This is very similar to our approach. I'm interested in how they actually find the topological
+map.)
+
+Topological mapping is the other major paradigm (besides metric) studied in mobile robotics. Cognitive map research sup-
+ports the creation of topological maps of large, complex environments [Lynch, 1960; Siegel and White,
+1975; Kuipers, 1978; Chown et al., 1995; Kuipers, 2000].
+
+A topological map, in its most basic form, rep- resents an environment as a graph where nodes represent places and
+edges represent connections between places. Several groups of robotics researchers have presented distinct topological
+implementations that differ in their semantics for the graphs—how they define/describe places and actions between them [Kuipers
+and Byun, 1991; Mataric, 1992; Shatkay and Kaelbling, 1997; Duckett and Nehmzow, 1999; Choset and
+Nagatani, 2001; Morris et al., 2005].
+
+Some implementations build topological maps autonomously, some are
+given topological maps a priori [Koenig and Simmons, 1996], and some let the robot explore autonomously
+while the researcher provides place names to overcome perceptual aliasing issues [Kortenkamp and Wey-
+mouth, 1994].
+
+The major hurdle for topological map-building has been the reliable abstraction of useful symbols from
+continuous, noisy perceptions of the environment: i.e., how to reliably detect and recognize places and
+paths. This is an instance of the more general symbol grounding problem [Harnad, 1990] that has troubled
+the AI community for many years. Probabilistic approaches are good at overcoming the kinds of local
+uncertainty and systematic noise that can hinder reliable symbol extraction. Incorporating probabilistic
+data association techniques into the topological map-building paradigm has sparked interest in hybrid map-
+building, including the HSSH approach presented in this paper.
+
+Their topological map encodes actions as well, because it is built upon the information of previous layer that involves
+robot motion. I think this makes the map less flexible. This topological map building focuses on "joints" and gateways,
+so the number of nodes are sparse. They also use Voronoi graph, which I think is used in a very similar way as
+what Francesco did.
+
+
+
+
+
+Hierarchical Hybrid Planning in a Mobile Service Robot (2015)
+- Recent Work -
+
+I am not able to understand what they are trying to do. They seem to be combining HTN (Hierarchical Task Network) with
+CSP (Constraint Satisfaction Problem) search in order to improve the robot task planning complexity and breath of knowledge
+coverage.
+
+
+The Inn at the Crossroads - A Model of Distributed Spatial Knowledge
+
+The paper describes a simple experiment aimed to demonstrate the possibility to create distributed cognitive
+maps of certain environments by means of recording basic information about the purposeful motion of a population of
+mobile agents.
+
+These active places interact with the mobile agents and create local patches of relevant navigation information, which is
+shared with other agents that reach the respective place. As a result, the system exhibits a globally consistent spatial
+behavior, using only locally available, incomplete spatial knowledge. Their spatial knowledge representation is simply a graph
+of accessible nodes and nothing more.
+
+
+
+What can we learn from 38,000 rooms? Reasoning about unexplored space in indoor environments (2012)
+- Recent Work -
+
+This is very close to what I am doing, which is understanding indoor environments. But it is mostly about
+human understanding -- not machine learning.
+
+Many robotics tasks require the robot to predict what lies in the unexplored part of the environment. Although
+much work focuses on building autonomous robots that operate indoors, indoor environments are neither well understood nor
+analyzed enough in the literature. In this paper, we propose and compare two methods for predicting both the topology
+and the categories of rooms given a partial map.
+
+In particular, utilizing graph theory, we discover that local complexity remains unchanged for growing global
+complexity in real-world indoor environments, a property which we exploit. Using this insight, we present two methods
+for predicting extensions to partial topological maps including room category labels.
+
+We report statistical properties of indoor environments by investigating the two floor plan data sets from
+different parts of the world. This data-driven approach to understanding man-made environments at the topo-
+logical map level is new and not found in previous work. We present various properties of indoor environments
+with the aim that such analysis will improve future designs of robots that operate indoors.
+
+Problem formulation: Given an incomplete floor plan graph, predict the most likely next room category together with where
+it is connected to in the current graph or the most likely new path between the two rooms.
+
+Their prediction results are not very good -- even with graphs of size around 15, the correctness of prediciton is around 10%.
+They didn't use machine learning. Their approach is mostly based on counting the edit distance between all possible splitted graph
+and those in dataset?
+
+
+Searching Objects in Large-scale Indoor Environments: A Decision-theoretic Approach (2012)
+- Recent work -
+
+Enable robots to search for objects in indoor environments. There is also a manmade semantic network. This is useful to
+planning of more specific tasks.
+
+
+
+Lifelong Information-Driven Exploration to Complete and Refine 4-D Spatio-Temporal Maps (2016)
+- Recent Work -
+
+This letter presents an exploration method that allows mobile robots to build and maintain spatio-temporal models of
+changing environments. The assumption of a perpetually changing world adds a temporal dimension to the exploration
+problem, making spatio-temporal exploration a never-ending, lifelong learning process.
+
+
+Unsupervised Learning of Qualitative Motion Behaviours by a Mobile Robot (2016)
+- Recent Work -
+
+The success of mobile robots, in daily living environments, depends on their capabilities to understand human movements
+and interact in a safe manner. This paper presents a novel unsupervised qualitative-relational framework for learning
+human motion patterns using a single mobile robot platform. It is capable of learning human motion patterns in real-world
+environments, in order to predict future behaviours.
